@@ -1,65 +1,65 @@
-import Image from "next/image";
+import { SiteNav } from "@/components/site-nav";
+import { Chapter } from "@/components/cinematic/chapter";
+import { IntroStage } from "@/components/cinematic/intro-stage";
+import { Hero } from "@/components/sections/hero";
+import { Stats } from "@/components/sections/stats";
+import { Menu } from "@/components/sections/menu";
+import { Shop } from "@/components/sections/shop";
+import { Ingredients } from "@/components/sections/ingredients";
+import { ZeroTricks } from "@/components/sections/zero-tricks";
+import { Ritual } from "@/components/sections/ritual";
+import { Heritage } from "@/components/sections/heritage";
+import { WorldMap } from "@/components/sections/world-map";
+import { Gallery } from "@/components/sections/gallery";
+import { Testimonials } from "@/components/sections/testimonials";
+import { Visit } from "@/components/sections/visit";
+import { Closing } from "@/components/sections/closing";
+import { Footer } from "@/components/sections/footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <SiteNav />
+      {/* relative z-10 + opaque bg: the curtain-reveal footer sits FIXED
+          behind this — main must fully cover it until the page scrolls away. */}
+      <main id="main" className="relative z-10 bg-paper">
+        {/* Ch.1 — Arrival: Earth from space → fly to Van → Hero → Stats.
+            noZoom: the intro globe is sticky and the Hero has its own useScroll;
+            a transform ancestor would offset both. */}
+        <Chapter index={1} chapter="arrival" noZoom>
+          <IntroStage />
+          <Hero />
+          <Stats />
+        </Chapter>
+
+        {/* Ch.2 — The Table */}
+        <Chapter index={2} chapter="table">
+          <Menu />
+          <Shop />
+        </Chapter>
+
+        {/* Ch.3 — The Ritual */}
+        <Chapter index={3} chapter="ritual">
+          <Ingredients />
+          <ZeroTricks />
+          <Ritual />
+        </Chapter>
+
+        {/* Ch.4 — Heritage & Map */}
+        <Chapter index={4} chapter="heritage">
+          <Heritage />
+          <WorldMap />
+          <Gallery />
+        </Chapter>
+
+        {/* Ch.5 — Visit */}
+        <Chapter index={5} chapter="visit">
+          <Testimonials />
+          <Visit />
+          <Closing />
+        </Chapter>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

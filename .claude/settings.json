@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\(Object.keys\\(p.dependencies\\).join\\(', '\\)\\)\")",
+      "Bash(node -e \"const p=require\\('lenis/package.json'\\);console.log\\(p.version, '| main:', p.main, '| module:', p.module, '| exports:', JSON.stringify\\(p.exports&&p.exports['.']\\)\\)\")",
+      "Bash(node -e \"console.log\\(require\\('motion/package.json'\\).version\\)\")",
+      "Bash(node -e \"const m=require\\('motion/react'\\); console.log\\(['useReducedMotion','useInView','useMotionValue','useSpring','useTransform','animate','motion','useScroll','AnimatePresence'].map\\(k=>k+':'+\\(k in m\\)\\).join\\(' '\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /tmp/home.html -w \"%{http_code}\\\\n\" --max-time 90 http://localhost:3100/)",
+      "Read(//tmp/**)",
+      "Bash(ffmpeg -version)",
+      "Bash(ffprobe -version)",
+      "Bash(node -e \"require\\('sharp'\\);console.log\\('sharp OK'\\)\")",
+      "Bash(curl --version)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\ysaha\\\\Desktop\\\\VanBreakfast\"; curl.exe -L --fail -o ffmpeg.zip \"https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip\" 2>&1 | Out-String; if \\(Test-Path ffmpeg.zip\\) { Write-Output \\(\"downloaded \" + \\(\\(Get-Item ffmpeg.zip\\).Length/1MB\\) + \" MB\"\\) } else { Write-Output \"DOWNLOAD FAILED\" })"
+    ]
+  }
+}

@@ -1,26 +1,350 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Akdamar Kahvaltı Evi — warm "ALPINO + Armenian" design system
+   ============================================================ */
+
+/* Brand tokens → generate utilities like bg-coral, text-ink, shadow-warm */
+@theme {
+  --color-paper: #fbf5ea;
+  --color-cream: #fffdf7;
+  --color-ink: #2a1a11;
+  --color-brown-700: #5a3a22;
+  --color-brown-500: #8a6a4f;
+  --color-coral: #e2761e;
+  --color-coral-600: #c9641a;
+  /* AA-contrast coral: ~5:1 with cream text, ~4.9:1 as text on paper/cream.
+     Used wherever coral carries small text (CTAs, badges, labels). */
+  --color-coral-deep: #b0540d;
+  --color-honey: #e9b949;
+  --color-honey-soft: #f3e2c4;
+  --color-olive: #44521f;
+  --color-olive-700: #36421a;
+  --color-pomegranate: #9e2b25;
+  /* Theme-CONSTANT tokens (identical in light & dark — unlike the ones the
+     .dark block flips): linen = light text/surfaces that sit on permanently
+     colored/dark grounds (olive bands, coral CTAs, photo overlays, footer);
+     shell = permanently dark grounds (footer, image scrims). */
+  --color-linen: #f6ecd9;
+  --color-shell: #241710;
+
+  --shadow-soft: 0 18px 40px -24px rgba(90, 58, 34, 0.35);
+  --shadow-warm: 0 30px 60px -30px rgba(90, 58, 34, 0.45);
+  --shadow-lift: 0 40px 80px -40px rgba(42, 26, 17, 0.5);
+
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+  --animate-marquee-reverse: marquee-reverse var(--marquee-duration, 40s)
+    linear infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+  /* Map pin "sonar" ping — a ring that expands and fades, looping (the global
+     reduced-motion guard below caps it to a single iteration). */
+  --animate-pulse-ring: pulse-ring 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+/* Map shadcn semantic tokens onto the warm palette */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-fraunces), Georgia, serif;
+  --font-armenian-serif: var(--font-noto-serif-armenian), Georgia, serif;
+  --font-armenian-sans: var(--font-noto-sans-armenian), system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.9);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.9rem;
+
+  --background: #fbf5ea; /* paper */
+  --foreground: #2a1a11; /* ink */
+  --card: #fffdf7; /* cream */
+  --card-foreground: #2a1a11;
+  --popover: #fffdf7;
+  --popover-foreground: #2a1a11;
+  --primary: #e2761e; /* coral / amber CTA */
+  --primary-foreground: #fffdf7;
+  --secondary: #f3e7ce; /* soft honey cream */
+  --secondary-foreground: #5a3a22;
+  --muted: #f1e7d5;
+  --muted-foreground: #8a6a4f;
+  --accent: #f3e2c4; /* honey tint */
+  --accent-foreground: #5a3a22;
+  --destructive: #9e2b25; /* pomegranate doubles as error */
+  --border: #e8dcc4; /* warm 1px border */
+  --input: #e2d3b8;
+  --ring: #e2761e; /* coral focus ring */
+  --chart-1: #e2761e;
+  --chart-2: #e9b949;
+  --chart-3: #44521f;
+  --chart-4: #9e2b25;
+  --chart-5: #5a3a22;
+  --sidebar: #fffdf7;
+  --sidebar-foreground: #2a1a11;
+  --sidebar-primary: #e2761e;
+  --sidebar-primary-foreground: #fffdf7;
+  --sidebar-accent: #f3e2c4;
+  --sidebar-accent-foreground: #5a3a22;
+  --sidebar-border: #e8dcc4;
+  --sidebar-ring: #e2761e;
+}
+
+/* Site-wide dark mode — warm "midnight cocoa" theme. Applied as a class on
+   <html> by next-themes. Brand tokens flip here too (utilities reference the
+   CSS vars), EXCEPT linen/shell which are deliberately theme-constant. */
+.dark {
+  --background: #171009;
+  --foreground: #f3e8d7;
+  --card: #211711;
+  --card-foreground: #f3e8d7;
+  --popover: #241912;
+  --popover-foreground: #f3e8d7;
+  --primary: #e2761e;
+  --primary-foreground: #1b120b;
+  --secondary: #2c1f15;
+  --secondary-foreground: #e8d9c2;
+  --muted: #2a1d13;
+  --muted-foreground: #ab8e72;
+  --accent: #33271a;
+  --accent-foreground: #e8d9c2;
+  --destructive: #d4564e;
+  --border: rgba(243, 232, 215, 0.14);
+  --input: rgba(243, 232, 215, 0.18);
+  --ring: #e2761e;
+
+  /* Brand token flips */
+  --color-paper: #171009;
+  --color-cream: #211711;
+  --color-ink: #f3e8d7;
+  --color-brown-700: #d8c3aa;
+  --color-brown-500: #ab8e72;
+  --color-honey-soft: #33271a;
+  /* "AA-safe coral as text" must brighten on dark grounds */
+  --color-coral-deep: #e8893a;
+  /* pomegranate doubles as error text — brighten for contrast */
+  --color-pomegranate: #d4564e;
+
+  --shadow-soft: 0 18px 40px -24px rgba(0, 0, 0, 0.6);
+  --shadow-warm: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  --shadow-lift: 0 40px 80px -40px rgba(0, 0, 0, 0.8);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/60;
+  }
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv05";
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-coral) 28%, transparent);
+    color: var(--color-ink);
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    letter-spacing: -0.02em;
+  }
+  /* Armenian locale: swap in Noto Armenian fonts (Latin display fonts lack
+     Armenian glyphs). Set by LanguageProvider via <html lang>. */
+  html[lang="hy"] body {
+    font-family: var(--font-noto-sans-armenian), var(--font-inter), sans-serif;
+  }
+  html[lang="hy"] h1,
+  html[lang="hy"] h2,
+  html[lang="hy"] h3,
+  html[lang="hy"] .font-display {
+    font-family: var(--font-noto-serif-armenian), var(--font-fraunces), serif;
+  }
+  /* Visible, on-brand focus for keyboard users */
+  :focus-visible {
+    outline: 2px solid var(--color-coral);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---- Utilities ---- */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .font-armenian {
+    font-family: var(--font-armenian-serif), var(--font-display), serif;
+  }
+  .font-armenian-sans {
+    font-family: var(--font-armenian-sans), var(--font-sans), sans-serif;
+  }
+  /* Subtle paper grain — rendered once, fixed, over the whole site */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+  /* Multiply-noise is invisible on near-black — switch to a faint screen. */
+  .dark .grain-overlay {
+    mix-blend-mode: screen;
+    opacity: 0.05;
+  }
+  .bg-radial-warm {
+    background: radial-gradient(
+      120% 120% at 50% 0%,
+      color-mix(in oklab, var(--color-honey) 22%, transparent) 0%,
+      transparent 55%
+    );
+  }
+  .shimmer-text {
+    background: linear-gradient(
+      110deg,
+      var(--color-ink) 0%,
+      var(--color-ink) 40%,
+      var(--color-coral) 50%,
+      var(--color-ink) 60%,
+      var(--color-ink) 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+}
+
+/* ---- Keyframes ---- */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(4%, -3%, 0) scale(1.12);
+    opacity: 0.8;
+  }
+}
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(230%) skewX(-18deg);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  80%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Respect reduced-motion: kill the looping CSS animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .shimmer-text {
+    color: var(--color-ink);
+    -webkit-text-fill-color: var(--color-ink);
+  }
+}
+
+/* ---- Lenis smooth scroll ---- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
 }

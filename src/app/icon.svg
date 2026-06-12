@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Akdamar">
+  <rect width="64" height="64" rx="16" fill="#E2761E" />
+  <path d="M32 16c2-4 7-5 11-5-1 4-4 6-8 7" fill="#44521F" />
+  <circle cx="32" cy="38" r="17" fill="#FFFDF7" />
+  <g fill="#E2761E">
+    <circle cx="32" cy="30" r="2.4" />
+    <circle cx="25" cy="36" r="2.4" />
+    <circle cx="39" cy="36" r="2.4" />
+    <circle cx="28.5" cy="43" r="2.4" />
+    <circle cx="35.5" cy="43" r="2.4" />
+    <circle cx="32" cy="38" r="2.4" />
+  </g>
+</svg>
