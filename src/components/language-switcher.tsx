@@ -37,7 +37,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={t.common.language}
+          aria-label={`${t.common.language}: ${localeMeta[locale].native}`}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream/70 px-3 py-2 text-sm font-medium text-ink/80 backdrop-blur-sm transition-colors hover:border-ink/25 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral",
             className,

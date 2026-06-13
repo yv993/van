@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Minus, Plus, ShoppingBag, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -13,13 +14,45 @@ import {
 } from "@/components/ui/sheet";
 import { CtaButton } from "@/components/ui/cta-button";
 import { useCart } from "@/lib/cart";
-import { useT } from "@/i18n/LanguageProvider";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import { interpolate } from "@/i18n/format";
 import { formatPrice } from "@/content/shop";
 
 export function CartDrawer() {
   const cart = useCart();
-  const t = useT();
+  const { t, locale } = useLanguage();
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  // cart → order → pay. With a provider configured (Stripe/iyzico) the server
+  // returns a hosted-checkout redirect; otherwise the order is recorded and we
+  // confirm "pay on arrival". Either way it's a real record, not just a toast.
+  async function checkout() {
+    setCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lines: cart.lines.map((l) => ({ id: l.id, qty: l.qty })),
+          locale,
+        }),
+      });
+      const data: { ok: boolean; redirectUrl?: string; error?: string } =
+        await res.json().catch(() => ({ ok: false }));
+      if (!res.ok || !data.ok) throw new Error(data.error ?? "failed");
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl; // provider-hosted payment
+        return;
+      }
+      toast.success(t.cart.checkoutNote); // pay-on-arrival demo
+      cart.clear();
+      cart.close();
+    } catch {
+      toast.error(t.visit.form.errorGeneric);
+    } finally {
+      setCheckingOut(false);
+    }
+  }
 
   return (
     <Sheet open={cart.isOpen} onOpenChange={cart.setOpen}>
@@ -121,9 +154,18 @@ export function CartDrawer() {
               variant="primary"
               size="md"
               className="w-full"
-              onClick={() => toast.success(t.cart.checkoutNote)}
+              disabled={checkingOut}
+              aria-busy={checkingOut}
+              onClick={checkout}
             >
-              {t.cart.checkout}
+              {checkingOut ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  {t.cart.checkout}
+                </>
+              ) : (
+                t.cart.checkout
+              )}
             </CtaButton>
             <p className="text-center text-xs text-brown-500">
               {t.cart.checkoutNote}

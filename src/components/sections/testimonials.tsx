@@ -85,6 +85,7 @@ export function Testimonials({ reviews }: { reviews?: GoogleReviews | null }) {
     return (
       <div
         className="flex gap-0.5 text-honey"
+        role="img"
         aria-label={interpolate(t.testimonials.starsLabel, { rating })}
       >
         {Array.from({ length: rating }).map((_, i) => (

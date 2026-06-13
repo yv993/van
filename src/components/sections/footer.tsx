@@ -107,9 +107,12 @@ export function Footer() {
   const contentY = useTransform(scrollYProgress, [0, 0.8], [36, 0]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [0.5, 1]);
 
-  // The reveal needs a measured height; until then (and under reduced motion)
-  // the footer renders in normal flow.
-  const reveal = !reduced && footerH > 0;
+  // Curtain reveal: the footer is FIXED from the first paint (so it never
+  // repositions → zero layout shift). The spacer starts at 0 and grows to the
+  // measured footer height after mount — that growth happens at the very bottom
+  // of the document, below the fold, so it shifts nothing visible (CLS ~0).
+  // Reduced motion opts out of the curtain entirely (normal in-flow footer).
+  const reveal = !reduced;
 
   const links = [
     { id: SECTION.menu, label: t.nav.menu },

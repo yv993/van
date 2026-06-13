@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { reservationSchema } from "@/lib/schemas";
-import { appendJsonl, clientIp, rateLimit } from "@/lib/api-helpers";
+import { appendJsonl, clientIp, rateLimit, readJsonl } from "@/lib/api-helpers";
 import { guestConfirmation, staffNotification } from "@/lib/emails";
 
 // fs + Resend need the Node runtime (not edge).
@@ -38,6 +38,18 @@ export async function POST(request: Request): Promise<Response> {
   }
   const data = parsed.data;
   const locale = data.locale ?? "en";
+
+  // Optional capacity guard: cap total covers per date+time slot.
+  const maxPerSlot = Number(process.env.RESERVATION_MAX_PER_SLOT);
+  if (Number.isFinite(maxPerSlot) && maxPerSlot > 0) {
+    const existing = await readJsonl("reservations.jsonl");
+    const booked = existing
+      .filter((r) => r.date === data.date && r.time === data.time)
+      .reduce((sum, r) => sum + (Number(r.guests) || 0), 0);
+    if (booked + data.guests > maxPerSlot) {
+      return json({ ok: false, error: "slot_full" }, 409);
+    }
+  }
 
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.RESERVATION_TO_EMAIL;

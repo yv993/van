@@ -78,11 +78,11 @@ export function Closing() {
           aria-hidden
         />
         <Wheat
-          className="pointer-events-none absolute top-6 left-6 hidden h-24 text-shell/15 lg:block"
+          className="animate-drift pointer-events-none absolute top-6 left-6 hidden h-24 text-shell/15 will-change-transform lg:block"
           aria-hidden
         />
         <OliveSprig
-          className="pointer-events-none absolute right-6 bottom-6 hidden w-28 text-shell/15 lg:block"
+          className="animate-drift-slow pointer-events-none absolute right-6 bottom-6 hidden w-28 text-shell/15 will-change-transform lg:block"
           aria-hidden
         />
 

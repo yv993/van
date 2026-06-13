@@ -1,10 +1,14 @@
-// Site-wide constants.
-// TODO: set the real production domain before launch.
-export const SITE_URL = "https://akdamar-kahvalti.example";
+// Site-wide constants — now derived from the single brand config so a new
+// client only edits src/config/brand.ts (see TEMPLATE.md). These re-exports
+// keep the existing import sites (SITE_URL / SITE_NAME / SOCIALS) unchanged.
+import { brand } from "@/config/brand";
 
-export const SITE_NAME = "Akdamar Kahvaltı Evi";
+export { brand };
 
-/** Section anchor ids used by the nav + smooth scroll. */
+export const SITE_URL = brand.url;
+export const SITE_NAME = brand.name;
+
+/** Section anchor ids used by the nav + smooth scroll (structural, not brand). */
 export const SECTION = {
   hero: "hero",
   shop: "shop",
@@ -15,8 +19,4 @@ export const SECTION = {
   visit: "visit",
 } as const;
 
-export const SOCIALS = [
-  { id: "instagram", href: "https://instagram.com" },
-  { id: "facebook", href: "https://facebook.com" },
-  { id: "youtube", href: "https://youtube.com" },
-] as const;
+export const SOCIALS = brand.socials;

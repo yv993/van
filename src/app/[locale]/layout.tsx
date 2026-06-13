@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import {
   Fraunces,
@@ -9,6 +9,7 @@ import {
 import "../globals.css";
 
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { brand } from "@/config/brand";
 import { localeAlternates, localeUrl } from "@/lib/i18n-routing";
 import { isLocale, locales, localeMeta, type Locale } from "@/i18n/config";
 import { dictionaries } from "@/i18n/dictionaries";
@@ -55,6 +56,11 @@ const notoSansArmenian = Noto_Sans_Armenian({
 });
 
 const ogImage = "/images/og.jpg";
+
+export const viewport: Viewport = {
+  themeColor: brand.themeColor,
+  colorScheme: "light dark",
+};
 
 // Prerender real localized HTML for all four locales (great for crawlers).
 export function generateStaticParams() {

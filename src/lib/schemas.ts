@@ -54,3 +54,22 @@ export const newsletterSchema = z.object({
 });
 
 export type NewsletterInput = z.infer<typeof newsletterSchema>;
+
+// Shop checkout. Only ids + quantities are trusted from the client — the route
+// looks prices up server-side (never trust client prices).
+export const orderSchema = z.object({
+  lines: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(60),
+        qty: z.coerce.number().int().min(1).max(50),
+      }),
+    )
+    .min(1)
+    .max(50),
+  email: z.email().max(120).optional().or(z.literal("")),
+  locale: z.enum(LOCALES).optional(),
+  website: honeypot,
+});
+
+export type OrderInput = z.infer<typeof orderSchema>;

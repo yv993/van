@@ -20,6 +20,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 import { interpolate } from "@/i18n/format";
 import { reservationSchema } from "@/lib/schemas";
 import { SECTION } from "@/lib/site";
+import { brand, hoursToMinutes } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
 interface FormErrors {
@@ -47,24 +48,26 @@ export function Visit() {
     setTodayStr(local.toISOString().slice(0, 10));
   }, []);
 
-  // "Open now / Closed" — open 06:00–14:00 daily, computed in the visitor's
-  // LOCAL time after mount (SSR-safe: null until mounted, like todayStr above).
+  // "Open now / Closed" — hours come from the brand config, computed in the
+  // visitor's LOCAL time after mount (SSR-safe: null until mounted).
   const [openNow, setOpenNow] = useState<boolean | null>(null);
   useEffect(() => {
+    const opens = hoursToMinutes(brand.hours.opens);
+    const closes = hoursToMinutes(brand.hours.closes);
     const compute = () => {
       const now = new Date();
       const mins = now.getHours() * 60 + now.getMinutes();
       // Local-time open/closed, computed post-mount to avoid a prerender/UTC mismatch.
-      setOpenNow(mins >= 6 * 60 && mins < 14 * 60);
+      setOpenNow(mins >= opens && mins < closes);
     };
     compute();
-    const id = setInterval(compute, 60_000); // keep fresh across the 06:00/14:00 edges
+    const id = setInterval(compute, 60_000); // keep fresh across the open/close edges
     return () => clearInterval(id);
   }, []);
 
   // Keyless Google Maps embed for the address (no API key needed).
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(
-    "Kahvaltı Sokağı, Van",
+    brand.mapQuery,
   )}&output=embed`;
 
   const [name, setName] = useState("");

@@ -159,7 +159,6 @@ export function Menu() {
                   <button
                     type="button"
                     onClick={() => setSelected(item)}
-                    aria-label={`${item.tr} — ${copy.name}`}
                     className="flex size-full flex-col text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-coral"
                   >
                     <div className="relative aspect-[5/4] w-full overflow-hidden">

@@ -48,8 +48,8 @@ export function Heritage() {
           </Reveal>
         </div>
 
-        {/* Scrolling panels */}
-        <ol className="relative flex flex-col">
+        {/* Scrolling panels (visual timeline) */}
+        <div className="relative flex flex-col">
           <span
             className="absolute top-2 bottom-2 left-[11px] w-px bg-linen/15"
             aria-hidden
@@ -72,7 +72,7 @@ export function Heritage() {
               {t.heritage.signoff}
             </p>
           </Reveal>
-        </ol>
+        </div>
       </div>
     </Section>
   );

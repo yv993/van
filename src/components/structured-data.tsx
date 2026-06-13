@@ -2,21 +2,11 @@ import { menuItems, menuCategoryOrder } from "@/content/menu";
 import type { MenuItemId } from "@/i18n/types";
 import { en } from "@/i18n/dictionaries/en";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { brand } from "@/config/brand";
 
-// schema.org Restaurant / LocalBusiness + a full Menu, built from the same
-// menu data the page renders (single source of truth). Rendered as a server
-// component so the JSON-LD ships in the initial HTML for crawlers. English
-// copy is used for the machine-readable names/descriptions.
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
+// schema.org Restaurant / LocalBusiness + a full Menu, built from the menu data
+// the page renders + the brand config (single source of truth). Rendered as a
+// server component so the JSON-LD ships in the initial HTML for crawlers.
 export function StructuredData() {
   const hasMenuSection = menuCategoryOrder
     .map((cat) => {
@@ -50,26 +40,27 @@ export function StructuredData() {
     description: en.meta.description,
     image: [`${SITE_URL}/images/og.jpg`],
     url: SITE_URL,
-    telephone: "+904320000000",
-    servesCuisine: ["Turkish", "Anatolian breakfast"],
-    priceRange: "₺₺",
+    telephone: brand.phoneTel,
+    servesCuisine: ["Turkish", brand.cuisine],
+    priceRange: brand.priceRange,
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Kahvaltı Sokağı",
-      addressLocality: "Van",
-      addressCountry: "TR",
+      streetAddress: brand.address.street,
+      addressLocality: brand.address.locality,
+      addressRegion: brand.address.region,
+      addressCountry: brand.address.countryCode,
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 38.5,
-      longitude: 43.38,
+      latitude: brand.geo.lat,
+      longitude: brand.geo.lng,
     },
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: DAYS,
-        opens: "06:00",
-        closes: "14:00",
+        dayOfWeek: brand.hours.days,
+        opens: brand.hours.opens,
+        closes: brand.hours.closes,
       },
     ],
     hasMenu: {

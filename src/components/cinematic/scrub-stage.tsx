@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { MotionValue } from "motion/react";
+import { brand } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -23,10 +24,10 @@ interface ScrubStageProps {
 // WebP frames — see CREDITS.md. 130 frames; the 1440px set (`descent/`, ~13MB)
 // serves roomy screens, the 960px set (`descent-sm/`, ~7MB) serves small /
 // low-DPI ones.
-const FRAME_COUNT = 130;
+const FRAME_COUNT = brand.cinematic.frameCount;
 const FRAME_BG = "#0a0806";
 const framePath = (dir: string, i: number) =>
-  `/frames/${dir}/frame_${String(i).padStart(4, "0")}.webp`;
+  `${dir}/frame_${String(i).padStart(4, "0")}.webp`;
 
 /**
  * Scroll-scrubbed cinematic descent — canvas image-sequence engine
@@ -92,7 +93,10 @@ export function ScrubStage({
 
     // Small / low-DPI viewports load the lighter 960px set; roomy screens the
     // crisp 1440px set. Decided once, at the moment the user arms the descent.
-    const dir = window.innerWidth < 1024 ? "descent-sm" : "descent";
+    const dir =
+      window.innerWidth < 1024
+        ? brand.cinematic.smallDir
+        : brand.cinematic.framesDir;
 
     let cancelled = false;
     let rafId = 0;

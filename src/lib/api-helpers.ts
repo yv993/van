@@ -16,6 +16,28 @@ export async function appendJsonl(
   await fs.appendFile(path.join(DATA_DIR, file), line, "utf8");
 }
 
+/** Read a .data/<file> JSONL store back into objects (empty if missing). */
+export async function readJsonl(
+  file: string,
+): Promise<Record<string, unknown>[]> {
+  try {
+    const raw = await fs.readFile(path.join(DATA_DIR, file), "utf8");
+    return raw
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          return JSON.parse(line) as Record<string, unknown>;
+        } catch {
+          return null;
+        }
+      })
+      .filter((r): r is Record<string, unknown> => r !== null);
+  } catch {
+    return [];
+  }
+}
+
 /** Best-effort client IP from proxy headers (Next 16 removed `request.ip`). */
 export function clientIp(req: Request): string {
   const xff = req.headers.get("x-forwarded-for");
