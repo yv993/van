@@ -2,10 +2,19 @@
 
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
+import type { Locale } from "@/i18n/config";
 import { CartProvider } from "@/lib/cart";
 import { Toaster } from "@/components/ui/sonner";
+import { ConsentBanner } from "@/components/consent-banner";
+import { SiteAnalytics } from "@/components/analytics";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
   return (
     // Light is the designed default; dark is an explicit visitor choice
     // (persisted by next-themes), not inherited from the OS.
@@ -15,10 +24,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem={false}
       disableTransitionOnChange
     >
-      <LanguageProvider>
+      <LanguageProvider initialLocale={initialLocale}>
         <CartProvider>
           {children}
           <Toaster position="bottom-right" />
+          {/* KVKK cookie banner + consent-gated, cookieless analytics. */}
+          <ConsentBanner />
+          <SiteAnalytics />
         </CartProvider>
       </LanguageProvider>
     </ThemeProvider>

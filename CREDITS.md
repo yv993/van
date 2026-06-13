@@ -25,10 +25,12 @@ sourced from Wikimedia Commons. Each requires attribution under its license.
   These are the *source frames* for the descent video; they live in
   `_source-frames/` (tracked, but **kept out of `public/` so they aren't
   deployed**) — only the rendered mp4 + its first/last JPG frames ship.
-- `public/frames/descent/frame_0001..0130.jpg` — the descent **canvas frame
-  sequence** (scroll-cinematic technique): the master clip sliced to 130
-  numbered JPGs at 1440px (~15MB) and scrubbed on a `<canvas>` by scroll
-  progress. Master clips live OUT of the deploy at
+- `public/frames/descent/frame_0001..0130.webp` (1440px, ~13MB) and
+  `public/frames/descent-sm/frame_0001..0130.webp` (960px, ~7MB) — the descent
+  **canvas frame sequence** (scroll-cinematic technique): the master clip sliced
+  to 130 numbered frames and scrubbed on a `<canvas>` by scroll progress. Stored
+  as WebP (q70); the small / low-DPI viewport loads the `-sm` set. Master clips
+  live OUT of the deploy at
   `_source-frames/descent-1080-v3.mp4` (+`-720`) — rendered locally with
   ffmpeg as a Ken-Burns dissolve chain (earth → stratosphere → golden aerial)
   from **4K Higgsfield upscales** (`_source-frames/zoom-*-4k.png`).
@@ -87,3 +89,39 @@ permits free commercial use (attribution appreciated, not required). They remain
 The few remaining slots still hot-link Unsplash (butter, walnut, çökelek,
 tereyağı, kavut, çörek, cacık, the gallery table/spread crops, and the 5
 testimonial avatars) — see the inline notes in `src/content/images.ts`.
+
+## Expanded menu — dish photography (Wikimedia / fallbacks)
+
+Real, license-safe dish photos for the 16-item expanded breakfast menu,
+self-hosted under `public/images/menu-<id>.jpg`. Each was downloaded from
+Wikipedia/Wikimedia Commons (lead photo for the named dish), resized to ≤1200px
+wide and recompressed to progressive mozjpeg (q80) with `sharp` (this strips
+metadata; no other edits), then **vision-verified** to confirm it depicts the
+dish. Where no faithful free image exists, the slot falls back to an existing
+local placeholder (noted **FALLBACK** + **TODO**). All Wikimedia images here are
+CC BY / CC BY-SA (free commercial use **with attribution**, recorded below);
+displaying them does not relicense them.
+
+| file | dish | source (Commons file page URL or FALLBACK) | license |
+| --- | --- | --- | --- |
+| `menu-kasar-peyniri.jpg` | aged yellow kaşar / kashkaval cheese | [File:Kaschkawal Kashkaval … Sofia IMG 7649.JPG](https://commons.wikimedia.org/wiki/File:Kaschkawal_Kashkaval_%D0%BA%D0%B0%D1%88%D0%BA%D0%B0%D0%B2%D0%B0%D0%BB_Balkank%C3%A4se_Sofia_IMG_7649.JPG) — Apostoloff | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-tereyaginda-bal.jpg` | village butter next to honey | **FALLBACK:** `public/images/bowl-bal-kaymak.jpg` (honey w/ dipper) — **TODO:** Wikipedia "Tereyağı"/"Butter" lead is a wrong image (a Swedish cake); "Kaymak" shows clotted cream with no honey. No faithful free butter+honey photo found; using the honey-bowl placeholder. | Unsplash (`photo-1645696675973-…`) |
+| `menu-tahin-pekmez.jpg` | tahini swirled with grape molasses | **FALLBACK:** `public/images/jar-murtuga.jpg` (pale tahini-style paste in jar) — **TODO:** no faithful free *tahin-pekmez swirl* exists; Wikipedia "Pekmez" shows only dark molasses (not the tahini blend), so the tahini-paste placeholder is used instead. | Unsplash (`photo-1571856515282-…`) |
+| `menu-acuka.jpg` | red pepper + walnut spread (acuka / muhammara) | [File:Tanoreen muhammara.jpg](https://commons.wikimedia.org/wiki/File:Tanoreen_muhammara.jpg) — Krista | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `menu-pastirmali-yumurta.jpg` | fried eggs with cured pastırma | [File:Pastirma with three eggs.jpg](https://commons.wikimedia.org/wiki/File:Pastirma_with_three_eggs.jpg) — E4024 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `menu-kavurmali-yumurta.jpg` | eggs with lamb kavurma (sahanda) | [File:Sahanda kavurmalı yumurta.jpg](https://commons.wikimedia.org/wiki/File:Sahanda_kavurmal%C4%B1_yumurta.jpg) — E4024 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `menu-cilbir.jpg` | poached eggs over garlic yogurt, chili butter | [File:Çılbır with duck-fat sautéed Ramps (14826584557).jpg](https://commons.wikimedia.org/wiki/File:%C3%87%C4%B1lb%C4%B1r_with_duck-fat_saut%C3%A9ed_Ramps_(14826584557).jpg) — Premshree Pillai | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) |
+| `menu-sigara-boregi.jpg` | fried filo cheese cigar rolls | [File:Sigara Böreği.JPG](https://commons.wikimedia.org/wiki/File:Sigara_B%C3%B6re%C4%9Fi.JPG) — CMoi | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-su-boregi.jpg` | layered boiled-dough cheese börek | [File:Su Böreği.JPG](https://commons.wikimedia.org/wiki/File:Su_B%C3%B6re%C4%9Fi.JPG) — Maderibeyza | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-gozleme.jpg` | griddle flatbread with filling | [File:Gözleme.JPG](https://commons.wikimedia.org/wiki/File:G%C3%B6zleme.JPG) — Maderibeyza | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-kaymakli-kayisi.jpg` | dried apricots (stuffed w/ kaymak) | [File:Ab food 04.jpg](https://commons.wikimedia.org/wiki/File:Ab_food_04.jpg) — Andrey Butko. **TODO:** real photo of *dried apricots* (faithful fruit) but it does **not** show the clotted-cream stuffing; no free "kaymaklı kayısı" photo exists on Commons. Preferred over the honey-bowl fallback as the more faithful subject. | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-katmer.jpg` | thin pastry with kaymak + pistachio | [File:Katmer (Antep).jpg](https://commons.wikimedia.org/wiki/File:Katmer_(Antep).jpg) — E4024 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `menu-kunefe.jpg` | shredded kadayıf cheese pastry in syrup | [File:Künefe 20230904.jpg](https://commons.wikimedia.org/wiki/File:K%C3%BCnefe_20230904.jpg) — Basak | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `menu-turk-kahvesi.jpg` | Turkish coffee, small cup + copper cezve | [File:Türk Kahvesi - Bakir Cezve.jpg](https://commons.wikimedia.org/wiki/File:T%C3%BCrk_Kahvesi_-_Bakir_Cezve.jpg) — Eaeeae | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-ayran.jpg` | frothy yogurt drink in a glass | [File:Fresh ayran.jpg](https://commons.wikimedia.org/wiki/File:Fresh_ayran.jpg) — Mavigogun | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+| `menu-salep.jpg` | warm milky cinnamon-dusted salep | [File:Salep drink.jpg](https://commons.wikimedia.org/wiki/File:Salep_drink.jpg) — DesignbyNur | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+
+**Summary: 13 REAL Wikimedia photos, 3 FALLBACK placeholders** (tereyaginda-bal,
+tahin-pekmez → existing local Unsplash files; kaymakli-kayisi uses a real but
+ingredient-only dried-apricots photo, flagged TODO for a true stuffed-apricot
+shot). Swap the three TODO slots for the client's own photography when available.

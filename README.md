@@ -125,14 +125,47 @@ Van, handing off to the Hero; Chapter 4 has an "advancing map" that flies to
   fly/zoom/scrub (compact static earth, hero shows directly, chapters are plain
   stacked sections, hero video off).
 
+## Reservations, newsletter, KVKK & analytics
+
+The reservation form (`/api/reservations`) and newsletter (`/api/newsletter`) are
+real Route Handlers sharing one **zod schema** ([`src/lib/schemas.ts`](src/lib/schemas.ts),
+reused on client + server), with a honeypot and a simple per-IP rate limit.
+
+**Works with zero secrets, better with them** — each route degrades gracefully:
+
+| Env vars | Behaviour |
+| --- | --- |
+| _(none)_ | Submissions append to `.data/reservations.jsonl` / `.data/newsletter.jsonl` + the server console, and still return success — so it runs locally / in CI with no setup. |
+| `RESEND_API_KEY` + `RESERVATION_TO_EMAIL` | Reservations email the restaurant **and** a branded confirmation to the guest (in their locale). |
+| `RESEND_API_KEY` + `RESEND_AUDIENCE_ID` | Newsletter signups are added to a Resend audience. |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Cookieless Plausible analytics (loaded only after consent). Otherwise Vercel Web Analytics (reports on Vercel only). |
+| `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID` | The testimonials section shows your **real** Google rating + up to 5 reviews (with required "Reviews from Google" attribution, 6h cache, not reordered). Without them, curated placeholder testimonials show. |
+
+Copy [`.env.local.example`](.env.local.example) → `.env.local` and fill what you
+need. **Production:** Resend needs a **verified sending domain** (the default
+`onboarding@resend.dev` only mails the account owner). The in-memory rate limiter
+resets on redeploy — swap for Upstash for real protection (TODO in
+[`src/lib/api-helpers.ts`](src/lib/api-helpers.ts)).
+
+**KVKK / consent:** a cookie / *Aydınlatma* banner (choice stored in `localStorage`,
+key `akdamar.consent`) gates analytics — nothing loads until the visitor clicks
+**Kabul et / Accept**. The legal pages `/gizlilik` (Aydınlatma Metni + KVKK Md. 11
+rights) and `/cerez-politikasi` render from [`src/content/legal/{tr,en}.ts`](src/content/legal/)
+in the active locale (TR operative, EN courtesy, HY/RU show EN + a note). **These
+texts are templates — review with a lawyer before launch.**
+
 ## Before launch
 
 - Set the real domain in [`src/lib/site.ts`](src/lib/site.ts) (`SITE_URL`) — it feeds
   `metadataBase`, OpenGraph/Twitter, `sitemap.xml` and `robots.txt`.
 - Swap the placeholder photos and the placeholder reviews (clearly commented).
-- Replace the demo phone number / reservation handling — the form is client-side
-  only (validates and confirms; it does **not** send anywhere yet). The shop
-  checkout is a demo (no payment is taken).
+- Replace the demo phone number. Reservations + the newsletter now POST to real
+  API route handlers (see **Reservations, newsletter, KVKK & analytics** above) —
+  add the Resend keys to actually email/store. The shop checkout is still a demo
+  (no payment is taken).
+- **KVKK:** the legal texts at `/gizlilik` and `/cerez-politikasi` are **templates**
+  — have the business and a lawyer review/complete them (controller name + address,
+  retention periods, başvuru e-mail) before launch.
 
 ## Project structure
 

@@ -28,6 +28,9 @@ export const tr: Dictionary = {
     openMenu: "Menüyü aç",
     cart: "Sepet",
     primary: "Birincil",
+    about: "Hakkımızda",
+    journal: "Günce",
+    faq: "SSS",
     mobileNav: "Mobil menü",
   },
   hero: {
@@ -169,13 +172,24 @@ export const tr: Dictionary = {
       "Tek fiyat, sonu gelmeyen küçük tabaklar. Sofranın bir köşesini seç — ya da hepsini getirelim.",
     all: "Hepsi",
     signature: "imza",
+    dietary: "Beslenme",
     categories: {
       cheese: "Peynirler & süt ürünleri",
       honey: "Bal & kaymak",
       spoon: "Kaşık klasikleri",
       hot: "Sıcaklar",
+      eggs: "Yumurta",
+      borek: "Börekler",
       bread: "Ekmek & hamur işi",
+      sweets: "Tatlılar",
       tea: "Çay",
+      drinks: "İçecekler",
+    },
+    tags: {
+      vegetarian: "Vejetaryen",
+      "contains-nuts": "Sert kuruyemiş içerir",
+      spicy: "Acılı",
+      sweet: "Tatlı",
     },
     items: {
       "otlu-peynir": {
@@ -230,6 +244,70 @@ export const tr: Dictionary = {
         name: "Semaver çayı",
         desc: "İnce belli bardakta demli çay.",
       },
+      "kasar-peyniri": {
+        name: "Eski kaşar",
+        desc: "Yumuşak, altın sarısı, hafif fındıksı olgun peynir.",
+      },
+      "tereyaginda-bal": {
+        name: "Tereyağında bal",
+        desc: "Köy tereyağı ve çiğ bal, yan yana.",
+      },
+      "tahin-pekmez": {
+        name: "Tahin-pekmez",
+        desc: "Üzüm pekmezine yedirilmiş susam ezmesi.",
+      },
+      acuka: {
+        name: "Acuka (Van ezmesi)",
+        desc: "Ateşli ceviz, kırmızı biber ve baharat ezmesi.",
+      },
+      "pastirmali-yumurta": {
+        name: "Pastırmalı yumurta",
+        desc: "Çıtırlaşmış pastırma ve köy yumurtası.",
+      },
+      "kavurmali-yumurta": {
+        name: "Kavurmalı yumurta",
+        desc: "Ağır pişmiş kuzu kavurma, yumurtayla.",
+      },
+      cilbir: {
+        name: "Çılbır",
+        desc: "Sarımsaklı yoğurt üzerine poşe yumurta, acı tereyağı.",
+      },
+      "sigara-boregi": {
+        name: "Sigara böreği",
+        desc: "İnce yufkada otlu beyaz peynir, çıtır çıtır.",
+      },
+      "su-boregi": {
+        name: "Su böreği",
+        desc: "İpeksi kat kat hamur, tereyağı ve peynir.",
+      },
+      gozleme: {
+        name: "Gözleme",
+        desc: "Saçta açılmış, peynirli ve otlu.",
+      },
+      "kaymakli-kayisi": {
+        name: "Kaymaklı kayısı",
+        desc: "Güneşte kurutulmuş kayısı, kaymak ve cevizle.",
+      },
+      katmer: {
+        name: "Katmer",
+        desc: "Kâğıt inceliğinde hamur, kaymak ve Antep fıstığı.",
+      },
+      kunefe: {
+        name: "Künefe",
+        desc: "Tel kadayıf, eriyen peynir, sıcak şerbet.",
+      },
+      "turk-kahvesi": {
+        name: "Türk kahvesi",
+        desc: "Taş değirmeninde, cezvede, lokumla.",
+      },
+      ayran: {
+        name: "Ayran",
+        desc: "Çırpılmış tuzlu yoğurt, buz gibi.",
+      },
+      salep: {
+        name: "Salep",
+        desc: "Tarçın serpili, içini ısıtan kış içeceği.",
+      },
     },
   },
   testimonials: {
@@ -246,6 +324,9 @@ export const tr: Dictionary = {
       "Diaspora Eats",
     ],
     starsLabel: "5 üzerinden {rating} yıldız",
+    googleAttribution: "Google yorumları",
+    readAllGoogle: "Tüm yorumları Google'da oku",
+    ratingFormat: "{rating} ★ · {total} Google yorumu",
     items: {
       araxie: {
         quote:
@@ -314,6 +395,9 @@ export const tr: Dictionary = {
     phoneLabel: "Önceden ara",
     phoneValue: "+90 432 000 00 00",
     mapPlaceholder: "Harita — Kahvaltı Sokağı, Van",
+    mapLabel: "Harita — Kahvaltı Sokağı, Van",
+    openNow: "Şu an açık",
+    closedNow: "Şu an kapalı",
     form: {
       title: "Masa ayırt",
       name: "Adınız",
@@ -323,11 +407,24 @@ export const tr: Dictionary = {
       guests: "Misafir",
       guest: "misafir",
       guestsPlural: "misafir",
+      email: "E-posta",
+      emailPlaceholder: "ornek@eposta.com",
+      phone: "Telefon",
+      phonePlaceholder: "+90 5xx xxx xx xx",
+      optional: "isteğe bağlı",
+      consent:
+        "Kişisel verilerimin işlenmesine ilişkin {link}'ni okudum ve kabul ediyorum.",
+      consentLink: "Aydınlatma Metni",
       submit: "Masa ayırt",
+      sending: "Gönderiliyor…",
       success:
         "Teşekkürler, {name}! {date} günü, {time} saati için {guests} kişilik masa talebiniz alındı. Telefonla teyit edeceğiz.",
+      errorGeneric:
+        "Bir şeyler ters gitti. Lütfen tekrar deneyin veya bizi arayın.",
       errors: {
         name: "Lütfen adınızı söyleyin.",
+        email: "Teyit edebilmemiz için geçerli bir e-posta girin.",
+        consent: "Devam etmek için lütfen aydınlatma metnini kabul edin.",
         date: "Lütfen bir tarih seçin.",
         datePast: "Lütfen bugünü ya da ileri bir tarihi seçin.",
         time: "Lütfen bir saat seçin.",
@@ -343,6 +440,10 @@ export const tr: Dictionary = {
     button: "Beni haberdar et",
     success: "Listedesin — şafakta görüşürüz.",
     invalidEmail: "Lütfen geçerli bir e-posta adresi girin.",
+    sending: "Kaydediliyor…",
+    error: "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+    consent: "Abone olarak {link}'ni kabul etmiş olursunuz.",
+    consentLink: "Aydınlatma Metni",
   },
   footer: {
     tagline:
@@ -355,6 +456,18 @@ export const tr: Dictionary = {
     signoffGloss: "afiyet olsun",
     rights: "© {year} Akdamar Kahvaltı Evi. Tüm hakları saklıdır.",
     credit: "Örnek site — görseller ve yorumlar yalnızca tasarım amaçlıdır.",
+    legal: {
+      title: "Yasal",
+      privacy: "Gizlilik",
+      cookies: "Çerezler",
+      note: "Bu hukuki metinler Türkçe ve İngilizce olarak sunulmaktadır.",
+    },
+  },
+  consent: {
+    title: "Çerezler ve gizliliğiniz",
+    body: "Çerezsiz bir analiz aracını yalnızca onayınızla kullanırız. {privacy} ve {cookies} sayfalarımıza bakın.",
+    accept: "Kabul et",
+    necessary: "Sadece gerekli",
   },
   cart: {
     title: "Sepetin",
@@ -367,6 +480,15 @@ export const tr: Dictionary = {
     increase: "Adedi artır",
     decrease: "Adedi azalt",
     itemCount: "{count} ürün",
+  },
+  journal: {
+    eyebrow: "Günce",
+    title: "Gölden notlar",
+    subtitle: "Ağır sabahlar, yaban otları ve sofranın ardındaki hikâyeler.",
+    readMore: "Devamını oku",
+    backToJournal: "Tüm günce",
+    prev: "Önceki",
+    next: "Sonraki",
   },
   chapterLabels: {
     arrival: "Varış",

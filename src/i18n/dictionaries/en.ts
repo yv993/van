@@ -28,6 +28,9 @@ export const en: Dictionary = {
     openMenu: "Open menu",
     cart: "Basket",
     primary: "Primary",
+    about: "About",
+    journal: "Journal",
+    faq: "FAQ",
     mobileNav: "Mobile menu",
   },
   hero: {
@@ -168,13 +171,24 @@ export const en: Dictionary = {
       "One price, endless small plates. Choose a corner of the table — or let us bring all of it.",
     all: "All",
     signature: "signature",
+    dietary: "Dietary",
     categories: {
       cheese: "Cheeses & dairy",
       honey: "Honey & cream",
       spoon: "Spoon classics",
       hot: "Hot",
+      eggs: "Eggs",
+      borek: "Pastries & böreks",
       bread: "Breads & pastry",
+      sweets: "Sweets",
       tea: "Tea",
+      drinks: "Drinks",
+    },
+    tags: {
+      vegetarian: "Vegetarian",
+      "contains-nuts": "Contains nuts",
+      spicy: "Spicy",
+      sweet: "Sweet",
     },
     items: {
       "otlu-peynir": {
@@ -229,6 +243,70 @@ export const en: Dictionary = {
         name: "Tea from the samovar",
         desc: "Black tea in tulip glasses.",
       },
+      "kasar-peyniri": {
+        name: "Aged kaşar",
+        desc: "Mellow, golden, gently nutty aged cheese.",
+      },
+      "tereyaginda-bal": {
+        name: "Butter & honey",
+        desc: "Village butter and raw honey, side by side.",
+      },
+      "tahin-pekmez": {
+        name: "Tahini & grape molasses",
+        desc: "Sesame paste swirled with grape molasses.",
+      },
+      acuka: {
+        name: "Van pepper-walnut paste",
+        desc: "Fiery walnut, red pepper and spice spread.",
+      },
+      "pastirmali-yumurta": {
+        name: "Eggs with pastırma",
+        desc: "Cured-beef pastırma crisped with farm eggs.",
+      },
+      "kavurmali-yumurta": {
+        name: "Eggs with kavurma",
+        desc: "Slow-confit lamb folded through eggs.",
+      },
+      cilbir: {
+        name: "Poached eggs on yogurt",
+        desc: "Poached eggs over garlic yogurt, chili butter.",
+      },
+      "sigara-boregi": {
+        name: "Rolled cheese pastry",
+        desc: "Crisp filo cigars with herbed white cheese.",
+      },
+      "su-boregi": {
+        name: "Layered cheese börek",
+        desc: "Silky boiled-dough layers, butter and cheese.",
+      },
+      gozleme: {
+        name: "Griddle flatbread",
+        desc: "Hand-rolled saç bread with cheese and herb.",
+      },
+      "kaymakli-kayisi": {
+        name: "Apricots & clotted cream",
+        desc: "Sun-dried apricots stuffed with kaymak and walnut.",
+      },
+      katmer: {
+        name: "Pistachio kaymak pastry",
+        desc: "Paper-thin pastry, clotted cream, Antep pistachio.",
+      },
+      kunefe: {
+        name: "Cheese kadayıf in syrup",
+        desc: "Shredded pastry, melting cheese, warm syrup.",
+      },
+      "turk-kahvesi": {
+        name: "Turkish coffee",
+        desc: "Stone-ground, copper-pot, served with lokum.",
+      },
+      ayran: {
+        name: "Yogurt drink",
+        desc: "Whipped salted yogurt, served cold.",
+      },
+      salep: {
+        name: "Warm orchid milk",
+        desc: "A cinnamon-dusted winter warmer.",
+      },
     },
   },
   testimonials: {
@@ -245,6 +323,9 @@ export const en: Dictionary = {
       "Diaspora Eats",
     ],
     starsLabel: "{rating} out of 5 stars",
+    googleAttribution: "Reviews from Google",
+    readAllGoogle: "Read all reviews on Google",
+    ratingFormat: "{rating} ★ · {total} Google reviews",
     items: {
       araxie: {
         quote:
@@ -313,6 +394,9 @@ export const en: Dictionary = {
     phoneLabel: "Call ahead",
     phoneValue: "+90 432 000 00 00",
     mapPlaceholder: "Map — Kahvaltı Sokağı, Van",
+    mapLabel: "Map of Kahvaltı Sokağı, Van",
+    openNow: "Open now",
+    closedNow: "Closed now",
     form: {
       title: "Reserve a table",
       name: "Your name",
@@ -322,11 +406,23 @@ export const en: Dictionary = {
       guests: "Guests",
       guest: "guest",
       guestsPlural: "guests",
+      email: "Email",
+      emailPlaceholder: "you@example.com",
+      phone: "Phone",
+      phonePlaceholder: "+90 5xx xxx xx xx",
+      optional: "optional",
+      consent:
+        "I have read and accept the {link} on the processing of my personal data.",
+      consentLink: "Privacy Notice",
       submit: "Reserve a table",
+      sending: "Sending…",
       success:
         "Thank you, {name}! A table for {guests} is requested for {date} at {time}. We'll confirm by phone.",
+      errorGeneric: "Something went wrong. Please try again or call us.",
       errors: {
         name: "Please tell us your name.",
+        email: "Please enter a valid email so we can confirm.",
+        consent: "Please accept the privacy notice to continue.",
         date: "Please choose a date.",
         datePast: "Please choose today or a future date.",
         time: "Please choose a time.",
@@ -342,6 +438,10 @@ export const en: Dictionary = {
     button: "Keep me posted",
     success: "You're on the list — see you at dawn.",
     invalidEmail: "Please enter a valid email address.",
+    sending: "Subscribing…",
+    error: "Something went wrong. Please try again.",
+    consent: "By subscribing you agree to our {link}.",
+    consentLink: "Privacy Notice",
   },
   footer: {
     tagline:
@@ -354,6 +454,18 @@ export const en: Dictionary = {
     signoffGloss: "enjoy your meal",
     rights: "© {year} Akdamar Kahvaltı Evi. All rights reserved.",
     credit: "Placeholder site — imagery and reviews are for design only.",
+    legal: {
+      title: "Legal",
+      privacy: "Privacy",
+      cookies: "Cookies",
+      note: "These legal texts are provided in Turkish and English.",
+    },
+  },
+  consent: {
+    title: "Cookies & your privacy",
+    body: "We use a cookieless analytics tool only with your consent. See our {privacy} and {cookies}.",
+    accept: "Accept",
+    necessary: "Necessary only",
   },
   cart: {
     title: "Your basket",
@@ -366,6 +478,15 @@ export const en: Dictionary = {
     increase: "Increase quantity",
     decrease: "Decrease quantity",
     itemCount: "{count} item(s)",
+  },
+  journal: {
+    eyebrow: "Journal",
+    title: "Notes from the lake",
+    subtitle: "Slow mornings, wild herbs and the stories behind the table.",
+    readMore: "Read more",
+    backToJournal: "All journal",
+    prev: "Previous",
+    next: "Next",
   },
   chapterLabels: {
     arrival: "Arrival",

@@ -12,7 +12,12 @@
       "Bash(ffprobe -version)",
       "Bash(node -e \"require\\('sharp'\\);console.log\\('sharp OK'\\)\")",
       "Bash(curl --version)",
-      "PowerShell(Set-Location \"C:\\\\Users\\\\ysaha\\\\Desktop\\\\VanBreakfast\"; curl.exe -L --fail -o ffmpeg.zip \"https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip\" 2>&1 | Out-String; if \\(Test-Path ffmpeg.zip\\) { Write-Output \\(\"downloaded \" + \\(\\(Get-Item ffmpeg.zip\\).Length/1MB\\) + \" MB\"\\) } else { Write-Output \"DOWNLOAD FAILED\" })"
+      "PowerShell(Set-Location \"C:\\\\Users\\\\ysaha\\\\Desktop\\\\VanBreakfast\"; curl.exe -L --fail -o ffmpeg.zip \"https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip\" 2>&1 | Out-String; if \\(Test-Path ffmpeg.zip\\) { Write-Output \\(\"downloaded \" + \\(\\(Get-Item ffmpeg.zip\\).Length/1MB\\) + \" MB\"\\) } else { Write-Output \"DOWNLOAD FAILED\" })",
+      "PowerShell(npx tsc --noEmit)",
+      "PowerShell(npx eslint src/components/sections/menu.tsx src/components/sections/visit.tsx src/components/structured-data.tsx src/app/layout.tsx src/content/menu.ts)",
+      "PowerShell(if \\($?\\) { \"TSC_OK\" } else { \"TSC_FAIL\" })",
+      "PowerShell(if \\($?\\) { \"ESLINT_OK\" } else { \"ESLINT_FAIL\" })",
+      "PowerShell($env:BASE_URL=\"http://localhost:3100\"; node e2e/capture-menu.mjs 2>&1 | Select-Object -Last 8)"
     ]
   }
 }

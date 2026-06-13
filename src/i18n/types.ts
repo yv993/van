@@ -1,4 +1,4 @@
-import type { MenuCategoryId } from "@/content/menu";
+import type { MenuCategoryId, MenuTag } from "@/content/menu";
 import type { ShopBadge } from "@/content/shop";
 
 // Id unions — every locale dictionary must provide copy for each id (enforced
@@ -7,16 +7,32 @@ export type MenuItemId =
   | "otlu-peynir"
   | "cokelek"
   | "van-tereyagi"
+  | "kasar-peyniri"
   | "bal-kaymak"
   | "van-cicek-bali"
+  | "tereyaginda-bal"
   | "murtuga"
   | "kavut"
   | "cacik"
+  | "tahin-pekmez"
+  | "acuka"
   | "sucuklu-yumurta"
   | "menemen"
+  | "pastirmali-yumurta"
+  | "kavurmali-yumurta"
+  | "cilbir"
+  | "sigara-boregi"
+  | "su-boregi"
+  | "gozleme"
   | "tandir-ekmegi"
   | "corek-pogaca"
-  | "semaver-cayi";
+  | "kaymakli-kayisi"
+  | "katmer"
+  | "kunefe"
+  | "semaver-cayi"
+  | "turk-kahvesi"
+  | "ayran"
+  | "salep";
 
 export type ShopProductId =
   | "van-honey"
@@ -56,10 +72,22 @@ export interface Dictionary {
     story: string;
     heritage: string;
     visit: string;
+    about: string;
+    journal: string;
+    faq: string;
     openMenu: string;
     cart: string;
     primary: string;
     mobileNav: string;
+  };
+  journal: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    readMore: string;
+    backToJournal: string;
+    prev: string;
+    next: string;
   };
   hero: {
     eyebrowArmenian: string; // "Բարի լույս"
@@ -116,7 +144,10 @@ export interface Dictionary {
     subtitle: string;
     all: string;
     signature: string;
+    /** Heading for the dietary-tag filter row. */
+    dietary: string;
     categories: Record<MenuCategoryId, string>;
+    tags: Record<MenuTag, string>;
     items: Record<MenuItemId, NamedDesc>;
   };
   testimonials: {
@@ -126,6 +157,9 @@ export interface Dictionary {
     featuredIn: string;
     featuredLogos: string[];
     starsLabel: string; // "{rating} out of 5"
+    googleAttribution: string; // REQUIRED when showing real Google reviews
+    readAllGoogle: string; // link → Google Maps
+    ratingFormat: string; // uses {rating} {total}, e.g. "{rating} ★ · {total} Google reviews"
     items: Record<TestimonialId, { quote: string; city: string; role: string }>;
   };
   gallery: {
@@ -150,23 +184,37 @@ export interface Dictionary {
     phoneLabel: string;
     phoneValue: string;
     mapPlaceholder: string;
+    mapLabel: string; // accessible title for the embedded map iframe
+    openNow: string; // "Open now"
+    closedNow: string; // "Closed now"
     form: {
       title: string;
       name: string;
       namePlaceholder: string;
+      email: string;
+      emailPlaceholder: string;
+      phone: string;
+      phonePlaceholder: string;
+      optional: string; // "(optional)" hint on the phone field
       date: string;
       time: string;
       guests: string;
       guest: string; // singular for "1 guest"
       guestsPlural: string;
+      consent: string; // KVKK consent sentence; contains "{link}" placeholder
+      consentLink: string; // the linked text inside the consent sentence
       submit: string;
+      sending: string; // pending state ("Sending…")
       success: string; // uses {name} {guests} {date} {time}
+      errorGeneric: string; // server/network failure
       errors: {
         name: string;
+        email: string;
         date: string;
         datePast: string;
         time: string;
         guests: string;
+        consent: string;
       };
     };
   };
@@ -175,8 +223,12 @@ export interface Dictionary {
     subtitle: string;
     emailPlaceholder: string;
     button: string;
+    sending: string; // pending state
     success: string;
+    error: string; // server/network failure
     invalidEmail: string;
+    consent: string; // short consent line; contains "{link}" placeholder
+    consentLink: string; // the linked text inside the consent line
   };
   footer: {
     tagline: string;
@@ -188,6 +240,18 @@ export interface Dictionary {
     signoffGloss: string; // "enjoy your meal"
     rights: string; // uses {year}
     credit: string;
+    legal: {
+      title: string; // section label, e.g. "Legal"
+      privacy: string; // → /gizlilik
+      cookies: string; // → /cerez-politikasi
+      note: string; // shown on legal pages in HY/RU: "provided in TR & EN"
+    };
+  };
+  consent: {
+    title: string;
+    body: string; // contains "{privacy}" and "{cookies}" link placeholders
+    accept: string;
+    necessary: string;
   };
   cart: {
     title: string;

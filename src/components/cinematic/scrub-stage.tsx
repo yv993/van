@@ -20,11 +20,13 @@ interface ScrubStageProps {
 }
 
 // The descent clip (earth → stratosphere → golden aerial) sliced to numbered
-// JPGs — see CREDITS.md. 130 source frames at 24fps, 1440px wide, ~15MB total.
+// WebP frames — see CREDITS.md. 130 frames; the 1440px set (`descent/`, ~13MB)
+// serves roomy screens, the 960px set (`descent-sm/`, ~7MB) serves small /
+// low-DPI ones.
 const FRAME_COUNT = 130;
 const FRAME_BG = "#0a0806";
-const framePath = (i: number) =>
-  `/frames/descent/frame_${String(i).padStart(4, "0")}.jpg`;
+const framePath = (dir: string, i: number) =>
+  `/frames/${dir}/frame_${String(i).padStart(4, "0")}.webp`;
 
 /**
  * Scroll-scrubbed cinematic descent — canvas image-sequence engine
@@ -75,7 +77,7 @@ export function ScrubStage({
     const conn = (
       navigator as Navigator & { connection?: NetworkInformation }
     ).connection;
-    // Too costly to fetch ~15MB of frames — the fallback carries the intro.
+    // Too costly to fetch the frame set — the fallback carries the intro.
     if (
       conn?.saveData ||
       conn?.effectiveType === "slow-2g" ||
@@ -88,6 +90,10 @@ export function ScrubStage({
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
+    // Small / low-DPI viewports load the lighter 960px set; roomy screens the
+    // crisp 1440px set. Decided once, at the moment the user arms the descent.
+    const dir = window.innerWidth < 1024 ? "descent-sm" : "descent";
+
     let cancelled = false;
     let rafId = 0;
     let current = -1; // last drawn frame index
@@ -98,7 +104,7 @@ export function ScrubStage({
     const images: HTMLImageElement[] = [];
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
-      img.src = framePath(i + 1);
+      img.src = framePath(dir, i + 1);
       images[i] = img;
     }
 

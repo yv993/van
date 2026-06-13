@@ -1,5 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Check, Globe } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,11 +10,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/i18n/LanguageProvider";
-import { locales, localeMeta } from "@/i18n/config";
+import { locales, localeMeta, type Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher({ className }: { className?: string }) {
-  const { locale, setLocale, t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [, startTransition] = useTransition();
+
+  // Locale is now the route — switching is a NAVIGATION to the same path under
+  // the chosen locale (e.g. /en/about → /tr/about), plus a cookie so the proxy
+  // remembers the choice for future locale-less visits.
+  function switchTo(next: Locale) {
+    if (next === locale) return;
+    // eslint-disable-next-line react-hooks/immutability -- legitimate side effect in a click handler: remember the locale for the proxy on future locale-less visits.
+    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
+    const segments = pathname.split("/");
+    segments[1] = next; // swap the leading locale segment
+    const target = segments.join("/") || `/${next}`;
+    startTransition(() => router.push(target));
+  }
 
   return (
     <DropdownMenu>
@@ -36,7 +54,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         {locales.map((l) => (
           <DropdownMenuItem
             key={l}
-            onSelect={() => setLocale(l)}
+            onSelect={() => switchTo(l)}
             className="cursor-pointer justify-between gap-4 rounded-xl"
           >
             <span className={cn(l === "hy" && "font-armenian-sans")}>

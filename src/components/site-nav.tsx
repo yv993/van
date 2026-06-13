@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, ShoppingBag } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import {
@@ -15,37 +17,54 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CartDrawer } from "@/components/cart-drawer";
 import { useCart } from "@/lib/cart";
-import { useT } from "@/i18n/LanguageProvider";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSmoothScroll } from "@/components/motion/smooth-scroll";
 import { SECTION } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function SiteNav() {
-  const t = useT();
+  const { t, locale } = useLanguage();
   const cart = useCart();
   const { scrollTo } = useSmoothScroll();
   const { scrollY } = useScroll();
+  const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 24));
 
-  const links = [
+  const home = `/${locale}`;
+  const isHome = pathname === home;
+
+  // Section links scroll on the home page; from any other page they navigate
+  // home with a hash (SmoothScroll scrolls to it on arrival).
+  const sectionLinks = [
     { id: SECTION.menu, label: t.nav.menu },
     { id: SECTION.shop, label: t.nav.shop },
     { id: SECTION.story, label: t.nav.story },
     { id: SECTION.heritage, label: t.nav.heritage },
     { id: SECTION.visit, label: t.nav.visit },
   ];
+  // Real routes.
+  const pageLinks = [
+    { href: `${home}/about`, label: t.nav.about },
+    { href: `${home}/journal`, label: t.nav.journal },
+    { href: `${home}/faq`, label: t.nav.faq },
+  ];
 
-  function go(target: string | number) {
-    scrollTo(target);
+  function goSection(id: string) {
+    if (isHome) scrollTo(`#${id}`);
+    else router.push(`${home}#${id}`);
   }
-
-  function goMobile(id: string) {
+  function goHome() {
+    if (isHome) scrollTo(0);
+    else router.push(home);
+  }
+  function goMobileSection(id: string) {
     setMobileOpen(false);
-    // let the sheet close before scrolling
-    window.setTimeout(() => scrollTo(`#${id}`), 60);
+    if (isHome) window.setTimeout(() => scrollTo(`#${id}`), 60);
+    else router.push(`${home}#${id}`);
   }
 
   return (
@@ -61,7 +80,7 @@ export function SiteNav() {
         {/* Wordmark */}
         <button
           type="button"
-          onClick={() => go(0)}
+          onClick={goHome}
           className="group flex items-center gap-2.5 rounded-full pr-2 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-coral"
         >
           <span className="grid size-9 shrink-0 place-items-center rounded-full bg-coral-deep text-cream shadow-[0_8px_18px_-8px_rgba(176,84,13,0.8)]">
@@ -81,18 +100,27 @@ export function SiteNav() {
 
         {/* Desktop links */}
         <nav
-          className="hidden items-center gap-1 lg:flex"
+          className="hidden items-center gap-0.5 lg:flex"
           aria-label={t.nav.primary}
         >
-          {links.map((link) => (
+          {sectionLinks.map((link) => (
             <button
               key={link.id}
               type="button"
-              onClick={() => go(`#${link.id}`)}
-              className="rounded-full px-3.5 py-2 text-sm font-medium text-ink/70 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+              onClick={() => goSection(link.id)}
+              className="rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
             >
               {link.label}
             </button>
+          ))}
+          {pageLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+            >
+              {link.label}
+            </Link>
           ))}
         </nav>
 
@@ -119,7 +147,7 @@ export function SiteNav() {
             variant="primary"
             size="sm"
             className="hidden md:inline-flex"
-            onClick={() => go(`#${SECTION.visit}`)}
+            onClick={() => goSection(SECTION.visit)}
           >
             {t.common.reserve}
           </CtaButton>
@@ -149,15 +177,25 @@ export function SiteNav() {
                 className="flex flex-col px-3 py-4"
                 aria-label={t.nav.mobileNav}
               >
-                {links.map((link) => (
+                {sectionLinks.map((link) => (
                   <button
                     key={link.id}
                     type="button"
-                    onClick={() => goMobile(link.id)}
+                    onClick={() => goMobileSection(link.id)}
                     className="rounded-2xl px-4 py-3.5 text-left font-display text-lg text-ink/85 transition-colors hover:bg-honey-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-coral"
                   >
                     {link.label}
                   </button>
+                ))}
+                {pageLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-2xl px-4 py-3.5 text-left font-display text-lg text-ink/85 transition-colors hover:bg-honey-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-coral"
+                  >
+                    {link.label}
+                  </Link>
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-4 border-t border-border px-6 py-6">
@@ -169,7 +207,7 @@ export function SiteNav() {
                   variant="primary"
                   size="md"
                   className="w-full"
-                  onClick={() => goMobile(SECTION.visit)}
+                  onClick={() => goMobileSection(SECTION.visit)}
                 >
                   {t.common.reserve}
                 </CtaButton>

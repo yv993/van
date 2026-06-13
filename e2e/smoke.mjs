@@ -29,17 +29,31 @@ async function main() {
   await page.goto(BASE, { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(800);
 
+  // 0. "/" redirects to a locale route (proxy)
+  check("/ redirects to a locale route", /\/(en|tr|hy|ru)(\/|$)/.test(page.url()), page.url());
+
   // 1. Render
   check("hero renders (EN)", await page.getByText("THE MORNING", { exact: false }).first().isVisible());
+
+  // 1b. Dismiss the KVKK consent banner ("Necessary only" → analytics stays off,
+  // so no third-party script and a clean console below).
+  const necessaryBtn = page.getByRole("button", { name: "Necessary only" });
+  if (await necessaryBtn.isVisible().catch(() => false)) {
+    await necessaryBtn.click();
+    await page.waitForTimeout(300);
+  }
+  check("consent banner dismissed", !(await necessaryBtn.isVisible().catch(() => false)));
 
   // 2. Language switch EN -> TR
   await page.getByRole("button", { name: "Language" }).first().click();
   await page.getByRole("menuitem", { name: "Türkçe" }).click();
+  await page.waitForURL(/\/tr(\/|$)/, { timeout: 15000 });
+  await page.waitForLoadState("load");
   await page.waitForTimeout(500);
   const trVisible = await page.getByText("İMPARATORLUKLARI", { exact: false }).first().isVisible().catch(() => false);
-  check("switched to Turkish", trVisible);
+  check("switched to Turkish (route /tr)", trVisible);
 
-  // 3. Persistence across reload
+  // 3. Persistence across reload (URL is the source of truth now)
   await page.reload({ waitUntil: "load" });
   await page.waitForTimeout(700);
   const trPersist = await page.getByText("İMPARATORLUKLARI", { exact: false }).first().isVisible().catch(() => false);
@@ -50,18 +64,24 @@ async function main() {
   // 4. Switch to Armenian
   await page.getByRole("button", { name: "Dil" }).first().click(); // "Language" in TR
   await page.getByRole("menuitem", { name: "Հայերեն" }).click();
-  await page.waitForTimeout(500);
+  await page.waitForURL(/\/hy(\/|$)/, { timeout: 15000 });
+  await page.waitForLoadState("load");
+  await page.waitForTimeout(400);
   const hyLang = await page.evaluate(() => document.documentElement.lang);
-  check("switched to Armenian (html lang=hy)", hyLang === "hy", `lang=${hyLang}`);
+  check("switched to Armenian (route /hy, html lang=hy)", hyLang === "hy", `lang=${hyLang}`);
 
   // 5. Switch to Russian then back to English
   await page.getByRole("button", { name: "Լեզու" }).first().click();
   await page.getByRole("menuitem", { name: "Русский" }).click();
+  await page.waitForURL(/\/ru(\/|$)/, { timeout: 15000 });
+  await page.waitForLoadState("load");
   await page.waitForTimeout(400);
   const ruLang = await page.evaluate(() => document.documentElement.lang);
-  check("switched to Russian", ruLang === "ru", `lang=${ruLang}`);
+  check("switched to Russian (route /ru)", ruLang === "ru", `lang=${ruLang}`);
   await page.getByRole("button", { name: "Язык" }).first().click();
   await page.getByRole("menuitem", { name: "English" }).click();
+  await page.waitForURL(/\/en(\/|$)/, { timeout: 15000 });
+  await page.waitForLoadState("load");
   await page.waitForTimeout(400);
 
   // 6. Add to cart
@@ -88,12 +108,14 @@ async function main() {
   const nameErr = await page.getByText("Please tell us your name.", { exact: false }).isVisible().catch(() => false);
   check("form shows validation error when empty", nameErr);
 
-  // valid submit
+  // valid submit (now also needs email + KVKK consent; POSTs to /api/reservations)
   await page.getByLabel("Your name").fill("Araxie");
+  await form.getByLabel("Email", { exact: true }).fill("araxie@example.com");
   await page.getByLabel("Date").fill("2026-09-20");
   await page.getByLabel("Time").fill("09:00");
+  await form.getByRole("checkbox").check(); // KVKK consent
   await submit.click();
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(1500); // POST round-trip + .data write
   const success = await page.getByText("A table for 2 is requested", { exact: false }).first().isVisible().catch(() => false);
   check("form submits successfully", success);
 

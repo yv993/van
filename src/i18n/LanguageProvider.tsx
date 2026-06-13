@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
   defaultLocale,
   isLocale,
   localeMeta,
-  STORAGE_KEY,
   type Locale,
 } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
@@ -20,45 +14,42 @@ import { dictionaries } from "@/i18n/dictionaries";
 interface LanguageContextValue {
   locale: Locale;
   t: Dictionary;
-  setLocale: (locale: Locale) => void;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // Always start at the default (English) so SSR and the first client render
-  // match; hydrate the stored preference right after mount.
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
+/**
+ * The active locale is now the ROUTE (/en, /tr, …) — the source of truth. This
+ * provider derives it from the route param via `useParams()`, which is correct
+ * during SSR (so the server HTML is already localized) and reactive to
+ * client-side locale navigation (the [locale] layout persists across a switch,
+ * so reading the param beats a stale `useState`). `initialLocale` (the route
+ * locale the layout passes) is only a fallback seed. Switching locale is a real
+ * navigation handled by the language switcher — not setState.
+ */
+export function LanguageProvider({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
+  const params = useParams();
+  const raw = typeof params?.locale === "string" ? params.locale : undefined;
+  const locale: Locale = isLocale(raw)
+    ? raw
+    : (initialLocale ?? defaultLocale);
 
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the persisted locale on mount; deliberate to keep SSR/first render English.
-      if (isLocale(stored)) setLocaleState(stored);
-    } catch {
-      /* localStorage unavailable — keep default */
-    }
-  }, []);
-
+  // Keep <html lang/dir> in sync on the client (SSR already set it from the
+  // route; this also covers soft navigations). DOM write only — no setState.
   useEffect(() => {
     const meta = localeMeta[locale];
     document.documentElement.lang = meta.htmlLang;
     document.documentElement.dir = meta.dir;
   }, [locale]);
 
-  const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
   return (
-    <LanguageContext.Provider
-      value={{ locale, t: dictionaries[locale], setLocale }}
-    >
+    <LanguageContext.Provider value={{ locale, t: dictionaries[locale] }}>
       {children}
     </LanguageContext.Provider>
   );

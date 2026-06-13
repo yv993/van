@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, useScroll, useTransform } from "motion/react";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { useT } from "@/i18n/LanguageProvider";
+import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSmoothScroll } from "@/components/motion/smooth-scroll";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { interpolate } from "@/i18n/format";
@@ -53,10 +55,19 @@ const NETWORK_NAMES = {
 } as const;
 
 export function Footer() {
-  const t = useT();
+  const { t, locale } = useLanguage();
   const { scrollTo } = useSmoothScroll();
+  const router = useRouter();
+  const pathname = usePathname();
   const reduced = useReducedMotion();
   const year = useMemo(() => new Date().getFullYear(), []);
+
+  const home = `/${locale}`;
+  const isHome = pathname === home;
+  const goSection = (id: string) => {
+    if (isHome) scrollTo(`#${id}`);
+    else router.push(`${home}#${id}`);
+  };
 
   // Curtain-reveal parallax: the footer is FIXED at the viewport bottom
   // BEHIND the opaque page (main is relative z-10 bg-paper); a spacer of
@@ -77,7 +88,8 @@ export function Footer() {
       const h =
         entry.borderBoxSize?.[0]?.blockSize ??
         entry.target.getBoundingClientRect().height;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount measurement; spacer height === natural footer height, so no visual shift.
+      // post-mount measurement in a ResizeObserver callback; spacer height ===
+      // natural footer height, so there's no visual shift.
       setFooterH(Math.round(h));
     });
     ro.observe(el);
@@ -184,11 +196,25 @@ export function Footer() {
                 <li key={link.id}>
                   <button
                     type="button"
-                    onClick={() => scrollTo(`#${link.id}`)}
+                    onClick={() => goSection(link.id)}
                     className="text-sm text-linen/75 transition-colors hover:text-coral focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
                   >
                     {link.label}
                   </button>
+                </li>
+              ))}
+              {[
+                { href: `${home}/about`, label: t.nav.about },
+                { href: `${home}/journal`, label: t.nav.journal },
+                { href: `${home}/faq`, label: t.nav.faq },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-linen/75 transition-colors hover:text-coral focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -244,7 +270,29 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-col items-center justify-between gap-2 text-xs text-linen/60 sm:flex-row">
+        {/* Legal */}
+        <nav
+          aria-label={t.footer.legal.title}
+          className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs"
+        >
+          <Link
+            href={`/${locale}/gizlilik`}
+            className="text-linen/65 transition-colors hover:text-coral focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+          >
+            {t.footer.legal.privacy}
+          </Link>
+          <span className="text-linen/25" aria-hidden>
+            ·
+          </span>
+          <Link
+            href={`/${locale}/cerez-politikasi`}
+            className="text-linen/65 transition-colors hover:text-coral focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+          >
+            {t.footer.legal.cookies}
+          </Link>
+        </nav>
+
+        <div className="mt-4 flex flex-col items-center justify-between gap-2 text-xs text-linen/60 sm:flex-row">
           <p>{interpolate(t.footer.rights, { year })}</p>
           <p>{t.footer.credit}</p>
         </div>

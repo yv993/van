@@ -83,6 +83,25 @@ export const IMG = {
   menuCacik: "1466637574441-749b8f19452f", // Unsplash placeholder
   menuCay: "/images/samovar-tea.jpg",
 
+  // Expanded menu — real dish photos sourced to /public/images (see CREDITS.md).
+  // Each file is guaranteed to exist (faithful download or nearest-dish fallback).
+  menuKasarPeyniri: "/images/menu-kasar-peyniri.jpg",
+  menuTereyagindaBal: "/images/menu-tereyaginda-bal.jpg",
+  menuTahinPekmez: "/images/menu-tahin-pekmez.jpg",
+  menuAcuka: "/images/menu-acuka.jpg",
+  menuPastirmaliYumurta: "/images/menu-pastirmali-yumurta.jpg",
+  menuKavurmaliYumurta: "/images/menu-kavurmali-yumurta.jpg",
+  menuCilbir: "/images/menu-cilbir.jpg",
+  menuSigaraBoregi: "/images/menu-sigara-boregi.jpg",
+  menuSuBoregi: "/images/menu-su-boregi.jpg",
+  menuGozleme: "/images/menu-gozleme.jpg",
+  menuKaymakliKayisi: "/images/menu-kaymakli-kayisi.jpg",
+  menuKatmer: "/images/menu-katmer.jpg",
+  menuKunefe: "/images/menu-kunefe.jpg",
+  menuTurkKahvesi: "/images/menu-turk-kahvesi.jpg",
+  menuAyran: "/images/menu-ayran.jpg",
+  menuSalep: "/images/menu-salep.jpg",
+
   // Testimonial avatars — Unsplash placeholders
   avatar1: "1494790108377-be9c29b29330",
   avatar2: "1500648767791-00dcc994a43e",

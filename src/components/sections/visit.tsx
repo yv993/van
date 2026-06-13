@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { Clock, MapPin, Phone, CheckCircle2, Navigation } from "lucide-react";
+import { Clock, MapPin, Phone, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Section, Eyebrow } from "@/components/sections/section";
 import { Reveal } from "@/components/motion/reveal";
@@ -15,17 +15,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CtaButton } from "@/components/ui/cta-button";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { interpolate } from "@/i18n/format";
+import { reservationSchema } from "@/lib/schemas";
 import { SECTION } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 interface FormErrors {
   name?: string;
+  email?: string;
   date?: string;
   time?: string;
   guests?: string;
+  consent?: string;
 }
+
+const PHONE_RE = /^[0-9+()\-\s]{5,30}$/;
+const cleanPhone = (v: string) => (PHONE_RE.test(v.trim()) ? v.trim() : "");
 
 export function Visit() {
   const { t, locale } = useLanguage();
@@ -40,64 +47,159 @@ export function Visit() {
     setTodayStr(local.toISOString().slice(0, 10));
   }, []);
 
+  // "Open now / Closed" — open 06:00–14:00 daily, computed in the visitor's
+  // LOCAL time after mount (SSR-safe: null until mounted, like todayStr above).
+  const [openNow, setOpenNow] = useState<boolean | null>(null);
+  useEffect(() => {
+    const compute = () => {
+      const now = new Date();
+      const mins = now.getHours() * 60 + now.getMinutes();
+      // Local-time open/closed, computed post-mount to avoid a prerender/UTC mismatch.
+      setOpenNow(mins >= 6 * 60 && mins < 14 * 60);
+    };
+    compute();
+    const id = setInterval(compute, 60_000); // keep fresh across the 06:00/14:00 edges
+    return () => clearInterval(id);
+  }, []);
+
+  // Keyless Google Maps embed for the address (no API key needed).
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(
+    "Kahvaltı Sokağı, Van",
+  )}&output=embed`;
+
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [guests, setGuests] = useState("2");
+  const [consent, setConsent] = useState(false);
+  const [website, setWebsite] = useState(""); // honeypot — real users never fill
   const [errors, setErrors] = useState<FormErrors>({});
+  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [success, setSuccess] = useState<string | null>(null);
 
-  function validate(): FormErrors {
-    const next: FormErrors = {};
-    if (!name.trim()) next.name = t.visit.form.errors.name;
-    if (!date) next.date = t.visit.form.errors.date;
-    else if (date < todayStr) next.date = t.visit.form.errors.datePast;
-    if (!time) next.time = t.visit.form.errors.time;
-    const g = Number(guests);
-    if (!Number.isFinite(g) || g < 1 || g > 12)
-      next.guests = t.visit.form.errors.guests;
-    return next;
+  const reset = () => {
+    setSuccess(null);
+    if (status === "error") setStatus("idle");
+  };
+
+  // Validate with the SHARED zod schema (same rules the server enforces), then
+  // map issues to localized field errors.
+  function collectErrors(): FormErrors {
+    const result = reservationSchema.safeParse({
+      name: name.trim(),
+      email: email.trim(),
+      phone: cleanPhone(phone),
+      date,
+      time,
+      guests: Number(guests),
+      consent,
+      website,
+      locale,
+    });
+    if (result.success) return {};
+    const fe: FormErrors = {};
+    for (const issue of result.error.issues) {
+      const field = issue.path[0];
+      if (field === "name") fe.name ??= t.visit.form.errors.name;
+      else if (field === "email") fe.email ??= t.visit.form.errors.email;
+      else if (field === "date")
+        fe.date ??= date ? t.visit.form.errors.datePast : t.visit.form.errors.date;
+      else if (field === "time") fe.time ??= t.visit.form.errors.time;
+      else if (field === "guests") fe.guests ??= t.visit.form.errors.guests;
+      else if (field === "consent") fe.consent ??= t.visit.form.errors.consent;
+    }
+    return fe;
   }
 
-  function onSubmit(e: React.FormEvent) {
+  function focusFirstError(fe: FormErrors) {
+    const order: (keyof FormErrors)[] = [
+      "name",
+      "email",
+      "date",
+      "time",
+      "guests",
+      "consent",
+    ];
+    const first = order.find((k) => fe[k]);
+    if (first) document.getElementById(`${ids}-${first}`)?.focus();
+  }
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const next = validate();
-    setErrors(next);
-    if (Object.keys(next).length > 0) {
+    const fe = collectErrors();
+    setErrors(fe);
+    if (Object.keys(fe).length > 0) {
       setSuccess(null);
+      setStatus("idle");
+      focusFirstError(fe);
       return;
     }
-    const when = new Date(`${date}T${time}`);
-    const dateStr = new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(
-      when,
-    );
-    const timeStr = new Intl.DateTimeFormat(locale, {
-      timeStyle: "short",
-    }).format(when);
-    const message = interpolate(t.visit.form.success, {
-      name: name.trim(),
-      guests,
-      date: dateStr,
-      time: timeStr,
-    });
-    setSuccess(message);
-    toast.success(message);
+
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          phone: cleanPhone(phone),
+          date,
+          time,
+          guests: Number(guests),
+          consent,
+          website,
+          locale,
+        }),
+      });
+      const data: { ok: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({ ok: false }));
+      if (!res.ok || !data.ok) throw new Error(data.error ?? "failed");
+
+      const when = new Date(`${date}T${time}`);
+      const dateStr = new Intl.DateTimeFormat(locale, {
+        dateStyle: "long",
+      }).format(when);
+      const timeStr = new Intl.DateTimeFormat(locale, {
+        timeStyle: "short",
+      }).format(when);
+      const message = interpolate(t.visit.form.success, {
+        name: name.trim(),
+        guests,
+        date: dateStr,
+        time: timeStr,
+      });
+      setSuccess(message);
+      setStatus("idle");
+      toast.success(message);
+    } catch {
+      setStatus("error");
+      toast.error(t.visit.form.errorGeneric);
+    }
   }
+
+  const sending = status === "sending";
 
   const info = [
     {
+      id: "hours",
       icon: Clock,
       label: t.visit.hoursLabel,
       value: t.visit.hoursValue,
       detail: t.visit.hoursDetail,
     },
     {
+      id: "address",
       icon: MapPin,
       label: t.visit.addressLabel,
       value: t.visit.addressValue,
       detail: t.visit.addressDetail,
     },
     {
+      id: "phone",
       icon: Phone,
       label: t.visit.phoneLabel,
       value: t.visit.phoneValue,
@@ -131,36 +233,59 @@ export function Visit() {
                     <item.icon className="size-4 text-coral-deep" />
                     {item.label}
                   </dt>
-                  <dd className="mt-2 font-medium text-ink">{item.value}</dd>
+                  <dd className="mt-2 font-medium text-ink">
+                    {item.id === "phone" ? (
+                      <a
+                        href={`tel:${item.value.replace(/\s+/g, "")}`}
+                        className="rounded-sm transition-colors hover:text-coral-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coral"
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      item.value
+                    )}
+                  </dd>
                   {item.detail ? (
                     <dd className="text-sm text-brown-500">{item.detail}</dd>
+                  ) : null}
+                  {item.id === "hours" && openNow !== null ? (
+                    <dd className="mt-2">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                          openNow
+                            ? "bg-olive/15 text-olive-700"
+                            : "bg-brown-500/10 text-brown-700",
+                        )}
+                        role="status"
+                      >
+                        <span
+                          className={cn(
+                            "size-1.5 rounded-full",
+                            openNow ? "bg-olive" : "bg-brown-500",
+                          )}
+                          aria-hidden
+                        />
+                        {openNow ? t.visit.openNow : t.visit.closedNow}
+                      </span>
+                    </dd>
                   ) : null}
                 </div>
               ))}
             </dl>
           </Reveal>
 
-          {/* Map placeholder */}
+          {/* Live map — keyless Google Maps embed for the address */}
           <Reveal delay={0.14}>
             <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-olive/10">
-              <div
-                className="absolute inset-0 opacity-70"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(0deg, rgba(68,82,31,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(68,82,31,0.10) 1px, transparent 1px)",
-                  backgroundSize: "32px 32px",
-                }}
-                aria-hidden
+              <iframe
+                title={t.visit.mapLabel}
+                src={mapSrc}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="absolute inset-0 size-full border-0"
               />
-              <div className="absolute inset-0 grid place-items-center">
-                <span className="inline-flex items-center gap-2 rounded-full bg-cream/90 px-4 py-2 text-sm font-medium text-brown-700 shadow-soft backdrop-blur-sm">
-                  <Navigation className="size-4 text-coral-deep" />
-                  {t.visit.mapPlaceholder}
-                </span>
-              </div>
-              <span className="absolute top-1/2 left-1/2 grid size-10 -translate-x-1/2 -translate-y-full place-items-center rounded-full bg-coral-deep text-cream shadow-warm">
-                <MapPin className="size-5" />
-              </span>
             </div>
           </Reveal>
         </div>
@@ -170,21 +295,32 @@ export function Visit() {
           <form
             onSubmit={onSubmit}
             noValidate
-            className="rounded-3xl border border-border bg-card p-6 shadow-warm sm:p-8"
+            className="relative rounded-3xl border border-border bg-card p-6 shadow-warm sm:p-8"
           >
             <h3 className="font-display text-2xl font-semibold tracking-tight text-ink">
               {t.visit.form.title}
             </h3>
 
-            {success ? (
-              <p
-                role="status"
-                className="mt-4 flex items-start gap-2 rounded-2xl border border-olive/25 bg-olive/10 p-4 text-sm text-olive-700"
-              >
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-olive" />
-                {success}
-              </p>
-            ) : null}
+            {/* Live region announces success / pending / error to screen readers */}
+            <div aria-live="polite" className="contents">
+              {success ? (
+                <p
+                  role="status"
+                  className="mt-4 flex items-start gap-2 rounded-2xl border border-olive/25 bg-olive/10 p-4 text-sm text-olive-700"
+                >
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-olive" />
+                  {success}
+                </p>
+              ) : null}
+              {status === "error" ? (
+                <p
+                  role="alert"
+                  className="mt-4 rounded-2xl border border-pomegranate/30 bg-pomegranate/10 p-4 text-sm text-pomegranate"
+                >
+                  {t.visit.form.errorGeneric}
+                </p>
+              ) : null}
+            </div>
 
             <div className="mt-6 flex flex-col gap-5">
               {/* Name */}
@@ -195,7 +331,7 @@ export function Visit() {
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
-                    setSuccess(null);
+                    reset();
                   }}
                   placeholder={t.visit.form.namePlaceholder}
                   aria-invalid={!!errors.name}
@@ -209,6 +345,52 @@ export function Visit() {
                 ) : null}
               </div>
 
+              {/* Email (required) */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`${ids}-email`}>{t.visit.form.email}</Label>
+                <Input
+                  id={`${ids}-email`}
+                  type="email"
+                  inputMode="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    reset();
+                  }}
+                  placeholder={t.visit.form.emailPlaceholder}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? `${ids}-email-err` : undefined}
+                  className="h-12 rounded-xl bg-paper/50"
+                />
+                {errors.email ? (
+                  <p id={`${ids}-email-err`} className="text-sm text-pomegranate">
+                    {errors.email}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Phone (optional) */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`${ids}-phone`}>
+                  {t.visit.form.phone}{" "}
+                  <span className="font-normal text-brown-500">
+                    ({t.visit.form.optional})
+                  </span>
+                </Label>
+                <Input
+                  id={`${ids}-phone`}
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    reset();
+                  }}
+                  placeholder={t.visit.form.phonePlaceholder}
+                  className="h-12 rounded-xl bg-paper/50"
+                />
+              </div>
+
               <div className="grid gap-5 sm:grid-cols-2">
                 {/* Date */}
                 <div className="flex flex-col gap-2">
@@ -220,7 +402,7 @@ export function Visit() {
                     value={date}
                     onChange={(e) => {
                       setDate(e.target.value);
-                      setSuccess(null);
+                      reset();
                     }}
                     aria-invalid={!!errors.date}
                     aria-describedby={
@@ -247,7 +429,7 @@ export function Visit() {
                     value={time}
                     onChange={(e) => {
                       setTime(e.target.value);
-                      setSuccess(null);
+                      reset();
                     }}
                     aria-invalid={!!errors.time}
                     aria-describedby={
@@ -273,7 +455,7 @@ export function Visit() {
                   value={guests}
                   onValueChange={(v) => {
                     setGuests(v);
-                    setSuccess(null);
+                    reset();
                   }}
                 >
                   <SelectTrigger
@@ -305,13 +487,52 @@ export function Visit() {
                 ) : null}
               </div>
 
+              {/* KVKK consent (required) */}
+              <ConsentCheckbox
+                id={`${ids}-consent`}
+                checked={consent}
+                onChange={(v) => {
+                  setConsent(v);
+                  reset();
+                }}
+                text={t.visit.form.consent}
+                linkLabel={t.visit.form.consentLink}
+                href={`/${locale}/gizlilik`}
+                error={errors.consent}
+              />
+
+              {/* Honeypot — visually + a11y hidden; bots that fill it are dropped */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden"
+              >
+                <label htmlFor={`${ids}-website`}>Website</label>
+                <input
+                  id={`${ids}-website`}
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                />
+              </div>
+
               <CtaButton
                 type="submit"
                 variant="primary"
                 size="lg"
-                className={cn("mt-1 w-full")}
+                disabled={sending}
+                aria-busy={sending}
+                className={cn("mt-1 w-full", sending && "opacity-80")}
               >
-                {t.visit.form.submit}
+                {sending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    {t.visit.form.sending}
+                  </>
+                ) : (
+                  t.visit.form.submit
+                )}
               </CtaButton>
             </div>
           </form>
