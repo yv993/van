@@ -5,6 +5,11 @@ import type { NextConfig } from "next";
 const IMMUTABLE = "public, max-age=31536000, immutable";
 
 const nextConfig: NextConfig = {
+  // Tree-shake barrel imports from these libs so only the used modules ship
+  // (lucide-react is already optimized by Next's default list).
+  experimental: {
+    optimizePackageImports: ["motion", "radix-ui"],
+  },
   images: {
     // Serve modern formats from the next/image optimizer (smallest first).
     formats: ["image/avif", "image/webp"],

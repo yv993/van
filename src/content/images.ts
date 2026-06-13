@@ -1,7 +1,10 @@
 // Central registry of imagery.
-// Entries that start with "/" are LOCAL files in /public/images (real,
-// commercially-licensed photos downloaded for self-hosting — see CREDITS.md).
-// The rest are Unsplash photo ids turned into URLs by `unsplash(id, w, h)`.
+// Every entry is now a LOCAL file in /public/images — the site is fully
+// self-hosted with ZERO external image dependencies (commercially-licensed
+// photos optimized into the repo — see CREDITS.md). The `unsplash()` helper
+// remains as a pass-through + sizing shim so an Unsplash photo id can still be
+// dropped in during prototyping (it builds the URL; needs the next.config
+// remotePattern).
 //
 // TODO: swap for the client's real photos — drop a file in /public/images and
 // point the slot at "/images/your-file.jpg" (it passes straight through).
@@ -38,8 +41,8 @@ export const IMG = {
   ingredientsHero: "/images/macro-honey.jpg",
   ingredientCheese: "/images/plate-otlu-peynir.jpg",
   ingredientHerbs: "/images/herbs.jpg",
-  ingredientButter: "1486297678162-eb2a19b0a32d", // Unsplash placeholder
-  ingredientWalnut: "1508061253366-f7da158b6d46", // Unsplash placeholder
+  ingredientButter: "/images/menu-tereyaginda-bal.jpg", // village butter & honey (real)
+  ingredientWalnut: "/images/walnut.jpg", // local — see CREDITS.md
   ingredientHoney: "/images/jar-honey.jpg",
 
   // Zero tricks feature cards
@@ -56,31 +59,31 @@ export const IMG = {
   heritageChurch: "/images/akhtamar-church.jpg",
 
   // Gallery + compare slider
-  galleryFull: "1498837167922-ddd27525d352", // Unsplash placeholder
-  galleryDawn: "1504754524776-8f4f37790ca0", // Unsplash placeholder
+  galleryFull: "/images/gallery-spread.jpg", // local — see CREDITS.md
+  galleryDawn: "/images/gallery-dawn.jpg", // local — see CREDITS.md
   galleryLake: "/images/lake-van.jpg", // REAL
   galleryChurch: "/images/akhtamar-church.jpg", // REAL
   galleryPomegranate: "/images/pomegranate.jpg",
-  galleryWalnut: "1508061253366-f7da158b6d46", // Unsplash placeholder
+  galleryWalnut: "/images/walnut.jpg", // local — see CREDITS.md
   galleryTea: "/images/samovar-tea.jpg",
   galleryBread: "/images/tandir-bread.jpg",
   galleryEggs: "/images/eggs-sucuk.jpg",
-  galleryTable: "1414235077428-338989a2e8c0", // Unsplash placeholder
+  galleryTable: "/images/gallery-table.jpg", // local — see CREDITS.md
   galleryLakeWide: "/images/lake-island.jpg", // REAL
 
   // Menu items
   menuOtluPeynir: "/images/plate-otlu-peynir.jpg",
-  menuCokelek: "1452195100486-9cc805987862", // Unsplash placeholder
-  menuTereyagi: "1504674900247-0877df9cc836", // Unsplash placeholder
+  menuCokelek: "/images/menu-cokelek.jpg", // local — see CREDITS.md
+  menuTereyagi: "/images/bowl-bal-kaymak.jpg", // village dairy (real)
   menuBalKaymak: "/images/bowl-bal-kaymak.jpg",
   menuCicekBali: "/images/jar-honey.jpg",
   menuMurtuga: "/images/jar-murtuga.jpg",
-  menuKavut: "1471943311424-646960669fbc", // Unsplash placeholder
+  menuKavut: "/images/jar-murtuga.jpg", // kavut ≈ murtuga (roasted flour) — real
   menuSucuk: "/images/eggs-sucuk.jpg",
   menuMenemen: "/images/menemen.jpg",
   menuTandir: "/images/tandir-bread.jpg",
-  menuCorek: "1549931319-a545dcf3bc73", // Unsplash placeholder
-  menuCacik: "1466637574441-749b8f19452f", // Unsplash placeholder
+  menuCorek: "/images/menu-corek.jpg", // local — see CREDITS.md
+  menuCacik: "/images/menu-ayran.jpg", // yoghurt (real)
   menuCay: "/images/samovar-tea.jpg",
 
   // Expanded menu — real dish photos sourced to /public/images (see CREDITS.md).
@@ -102,10 +105,10 @@ export const IMG = {
   menuAyran: "/images/menu-ayran.jpg",
   menuSalep: "/images/menu-salep.jpg",
 
-  // Testimonial avatars — Unsplash placeholders
-  avatar1: "1494790108377-be9c29b29330",
-  avatar2: "1500648767791-00dcc994a43e",
-  avatar3: "1438761681033-6461ffad8d80",
-  avatar4: "1507003211169-0a1dd7228f2d",
-  avatar5: "1544005313-94ddf0286df2",
+  // Testimonial avatars — self-hosted, optimized (see CREDITS.md)
+  avatar1: "/images/avatar-1.jpg",
+  avatar2: "/images/avatar-2.jpg",
+  avatar3: "/images/avatar-3.jpg",
+  avatar4: "/images/avatar-4.jpg",
+  avatar5: "/images/avatar-5.jpg",
 } as const;

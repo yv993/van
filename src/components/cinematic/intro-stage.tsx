@@ -60,29 +60,38 @@ export function IntroStage() {
   );
   const paperFade = useTransform(progress, [0.72, 0.9], [0, 1]);
 
-  if (reduced) {
-    return (
-      <div className="relative h-[58vh] min-h-[420px] w-full">
-        <GlobeStage mode="intro" alt={t.worldMap.alt} className="absolute inset-0" />
-        <div className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-1.5 px-6 text-center">
-          <p className="font-armenian text-2xl text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]">
-            {t.hero.eyebrowArmenian}
-            {t.hero.eyebrowTurkish ? (
-              <span className="ml-2 font-display text-xl text-linen/90 italic">
-                · {t.hero.eyebrowTurkish}
-              </span>
-            ) : null}
-          </p>
-          <p className="text-xs font-semibold tracking-[0.3em] text-linen/75 uppercase">
-            {t.worldMap.eyebrow}
-          </p>
-        </div>
+  // Lighter static banner — used under reduced motion AND on phones/tablets
+  // (the 240vh scroll-scrubbed descent is a desktop delight; on a small screen
+  // it's a heavy above-the-fold layout + 2.4 screens of awkward scrolling). A
+  // poster earth + caption: fast to paint (the real mobile-FCP win) and calmer.
+  const banner = (
+    <div className="relative h-[58vh] min-h-[420px] w-full">
+      <GlobeStage mode="intro" alt={t.worldMap.alt} className="absolute inset-0" />
+      <div className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-1.5 px-6 text-center">
+        <p className="font-armenian text-2xl text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]">
+          {t.hero.eyebrowArmenian}
+          {t.hero.eyebrowTurkish ? (
+            <span className="ml-2 font-display text-xl text-linen/90 italic">
+              · {t.hero.eyebrowTurkish}
+            </span>
+          ) : null}
+        </p>
+        <p className="text-xs font-semibold tracking-[0.3em] text-linen/75 uppercase">
+          {t.worldMap.eyebrow}
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
 
+  if (reduced) return banner;
+
+  // Phones/tablets get the banner; desktop gets the full cinematic descent. The
+  // split is CSS (display), so it's SSR-stable — no client width-check, no
+  // hydration flash, and the hidden branch is never laid out/painted.
   return (
-    <div ref={ref} className="relative h-[240vh] w-full">
+    <>
+      <div className="md:hidden">{banner}</div>
+      <div ref={ref} className="relative hidden h-[240vh] w-full md:block">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Fallback descent (earth still → lake photo) — also the poster the
             scrub video fades in over once its frames are decoded. */}
@@ -166,6 +175,7 @@ export function IntroStage() {
           aria-hidden
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { useHeavyMedia } from "@/lib/use-heavy-media";
 import { Section } from "@/components/sections/section";
 import { CtaButton } from "@/components/ui/cta-button";
 import { Reveal } from "@/components/motion/reveal";
@@ -23,6 +24,9 @@ const SIGNATURE_THUMBS = [
 export function Hero() {
   const t = useT();
   const reduced = useReducedMotion();
+  // Heavy autoplay loop only on capable devices; phones/Save-Data keep the
+  // crisp <Image> (which is the LCP element) and skip the 1.5 MB download.
+  const heavyOk = useHeavyMedia();
   const { scrollTo } = useSmoothScroll();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -146,9 +150,11 @@ export function Hero() {
                     // TODO: swap for the client's real photos / Higgsfield hero
                   />
                   {/* Cinematic hero loop — covers the still once loaded.
-                      Disabled under reduced motion (still image only). The
-                      priority <Image> above stays the LCP element + poster. */}
-                  {!reduced ? (
+                      Disabled under reduced motion AND on phones / Save-Data /
+                      slow links (heavyOk): autoplay forces the full 1.5 MB
+                      download regardless of preload, so it stays off the mobile
+                      critical path. The priority <Image> above is the LCP. */}
+                  {!reduced && heavyOk ? (
                     <video
                       className="absolute inset-0 size-full object-cover"
                       autoPlay

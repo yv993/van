@@ -22,10 +22,15 @@ import { HashScroll } from "@/components/hash-scroll";
 // Primary DISPLAY font (the hero headline → the LCP element). Kept variable so
 // its optical-size axis keeps large headings crisp and the footer's italic
 // works; it's the ONLY preloaded font.
+// Static instances (not the variable font) at the weights/styles actually used
+// — markedly smaller than the variable file AND a closer fallback-metric match,
+// so the swap is shift-free (CLS ~0 vs ~0.07 with the variable face).
 const fraunces = Fraunces({
   subsets: ["latin", "latin-ext"],
   variable: "--font-fraunces",
   display: "swap",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   preload: true,
 });
 
@@ -123,6 +128,9 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const meta = localeMeta[locale];
+  // Ship ONLY the active locale's dictionary to the client (as serialized
+  // props), instead of bundling all four as JS modules in LanguageProvider.
+  const dict = dictionaries[locale];
 
   return (
     // Light is the designed default; dark is an explicit choice (next-themes).
@@ -134,7 +142,7 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-full flex-col bg-paper text-ink">
         <StructuredData />
-        <Providers initialLocale={locale}>
+        <Providers initialLocale={locale} dictionary={dict}>
           <SkipLink />
           <SmoothScroll>
             <HashScroll />

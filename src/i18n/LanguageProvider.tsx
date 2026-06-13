@@ -9,7 +9,6 @@ import {
   type Locale,
 } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
-import { dictionaries } from "@/i18n/dictionaries";
 
 interface LanguageContextValue {
   locale: Locale;
@@ -26,13 +25,21 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
  * so reading the param beats a stale `useState`). `initialLocale` (the route
  * locale the layout passes) is only a fallback seed. Switching locale is a real
  * navigation handled by the language switcher — not setState.
+ *
+ * The active-locale `dictionary` is passed in from the SERVER layout (which
+ * knows the route locale) rather than imported here — so the client bundle
+ * ships ONE locale's strings as serialized data instead of all four as JS
+ * modules. On a locale switch the route re-renders server-side and supplies the
+ * new dictionary, kept consistent with the `useParams()` locale below.
  */
 export function LanguageProvider({
   children,
   initialLocale,
+  dictionary,
 }: {
   children: React.ReactNode;
   initialLocale?: Locale;
+  dictionary: Dictionary;
 }) {
   const params = useParams();
   const raw = typeof params?.locale === "string" ? params.locale : undefined;
@@ -49,7 +56,7 @@ export function LanguageProvider({
   }, [locale]);
 
   return (
-    <LanguageContext.Provider value={{ locale, t: dictionaries[locale] }}>
+    <LanguageContext.Provider value={{ locale, t: dictionary }}>
       {children}
     </LanguageContext.Provider>
   );

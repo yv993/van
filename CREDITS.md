@@ -86,9 +86,30 @@ permits free commercial use (attribution appreciated, not required). They remain
 | `menemen.jpg` | eggs, tomato & pepper | `photo-1682622110419-b671026a4536` |
 | `herbs.jpg` | fresh herbs on a board | `photo-1604543631489-4c03c8cc6ded` |
 
-The few remaining slots still hot-link Unsplash (butter, walnut, çökelek,
-tereyağı, kavut, çörek, cacık, the gallery table/spread crops, and the 5
-testimonial avatars) — see the inline notes in `src/content/images.ts`.
+### Self-hosted (final localization pass)
+
+The last hot-linked Unsplash slots were **downloaded, cropped, and recompressed
+with `sharp` (mozjpeg q72, metadata stripped)** into `public/images/`, so the
+site now has **zero external image dependencies**. [Unsplash License](https://unsplash.com/license)
+(free commercial use). All remain **placeholders** — swap for the client's shoot.
+
+| File | Subject | Unsplash photo |
+| --- | --- | --- |
+| `gallery-spread.jpg` | overhead mixed-meze spread | `photo-1498837167922-ddd27525d352` |
+| `gallery-dawn.jpg` | laid breakfast table | `photo-1504754524776-8f4f37790ca0` |
+| `gallery-table.jpg` | set dining table | `photo-1414235077428-338989a2e8c0` |
+| `walnut.jpg` | bowl of nuts (used for the walnut/nuts slots) | `photo-1508061253366-f7da158b6d46` |
+| `menu-cokelek.jpg` | aged cheese w/ figs (çökelek stand-in) | `photo-1452195100486-9cc805987862` |
+| `menu-corek.jpg` | sliced rustic loaf (çörek) | `photo-1549931319-a545dcf3bc73` |
+| `avatar-1.jpg` … `avatar-5.jpg` | testimonial portraits (200×200) | `photo-1494790108377-…`, `-1500648767791-…`, `-1438761681033-…`, `-1507003211169-…`, `-1544005313-…` |
+
+A few menu slots whose old stock photo was off-subject were repointed to the
+**closest accurate existing local asset** instead (some image reuse across cards,
+flagged TODO for the client's own dish photography):
+`ingredientButter` → `menu-tereyaginda-bal.jpg` (butter & honey) ·
+`menuTereyagi` → `bowl-bal-kaymak.jpg` (village dairy) ·
+`menuKavut` → `jar-murtuga.jpg` (roasted-flour paste, ≈ kavut) ·
+`menuCacik` → `menu-ayran.jpg` (yoghurt).
 
 ## Expanded menu — dish photography (Wikimedia / fallbacks)
 

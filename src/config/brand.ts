@@ -66,9 +66,10 @@ export interface BrandConfig {
    * is otherwise unchanged.
    */
   cinematic: {
-    framesDir: string; // 1440px set
-    smallDir: string; // 960px set (small / low-DPI)
-    frameCount: number;
+    framesDir: string; // 1440px set (desktop ≥ 1024px)
+    smallDir: string; // lighter set (tablet 768–1023px); phones get the poster
+    frameCount: number; // frames in framesDir
+    smallFrameCount: number; // frames in smallDir (may be fewer — lighter)
     poster: string; // still shown before frames arm / as fallback
   };
 
@@ -132,6 +133,7 @@ export const brand: BrandConfig = {
     framesDir: "/frames/descent",
     smallDir: "/frames/descent-sm",
     frameCount: 130,
+    smallFrameCount: 66, // tablet set: half the frames, smaller dimensions
     poster: "/images/earth.jpg",
   },
 

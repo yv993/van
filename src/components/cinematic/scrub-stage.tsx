@@ -3,14 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { MotionValue } from "motion/react";
 import { brand } from "@/config/brand";
+import { heavyMediaAllowed } from "@/lib/use-heavy-media";
 import { cn } from "@/lib/utils";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-
-interface NetworkInformation {
-  saveData?: boolean;
-  effectiveType?: string;
-}
 
 interface ScrubStageProps {
   /** intro scroll progress 0..1; the sequence consumes [0, videoEnd] of it */
@@ -21,10 +17,10 @@ interface ScrubStageProps {
 }
 
 // The descent clip (earth → stratosphere → golden aerial) sliced to numbered
-// WebP frames — see CREDITS.md. 130 frames; the 1440px set (`descent/`, ~13MB)
-// serves roomy screens, the 960px set (`descent-sm/`, ~7MB) serves small /
-// low-DPI ones.
-const FRAME_COUNT = brand.cinematic.frameCount;
+// WebP frames — see CREDITS.md. The 1440px set (`descent/`, 130 frames) serves
+// desktop ≥ 1024px; the lighter `descent-sm/` set (fewer frames, smaller dims)
+// serves tablets 768–1023px. Phones / Save-Data / slow links load NO frames —
+// the GlobeStage poster carries the intro (heavyMediaAllowed gate below).
 const FRAME_BG = "#0a0806";
 const framePath = (dir: string, i: number) =>
   `${dir}/frame_${String(i).padStart(4, "0")}.webp`;
@@ -75,28 +71,21 @@ export function ScrubStage({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const conn = (
-      navigator as Navigator & { connection?: NetworkInformation }
-    ).connection;
-    // Too costly to fetch the frame set — the fallback carries the intro.
-    if (
-      conn?.saveData ||
-      conn?.effectiveType === "slow-2g" ||
-      conn?.effectiveType === "2g" ||
-      conn?.effectiveType === "3g"
-    ) {
-      return;
-    }
+    // Phones / Save-Data / slow links: too costly to fetch any frame set — the
+    // GlobeStage poster (a scroll-driven earth→lake dissolve) carries the intro.
+    // This is the key mobile-CWV win: zero megabytes of frames on small screens.
+    if (!heavyMediaAllowed(768)) return;
 
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    // Small / low-DPI viewports load the lighter 960px set; roomy screens the
-    // crisp 1440px set. Decided once, at the moment the user arms the descent.
-    const dir =
-      window.innerWidth < 1024
-        ? brand.cinematic.smallDir
-        : brand.cinematic.framesDir;
+    // Tablets (768–1023px) load the lighter `descent-sm` set (fewer frames,
+    // smaller dims); desktop the crisp 1440px set. Decided once, at arm time.
+    const small = window.innerWidth < 1024;
+    const dir = small ? brand.cinematic.smallDir : brand.cinematic.framesDir;
+    const frameCount = small
+      ? brand.cinematic.smallFrameCount
+      : brand.cinematic.frameCount;
 
     let cancelled = false;
     let rafId = 0;
@@ -106,7 +95,7 @@ export function ScrubStage({
     // Preload every frame (skill rule). Browsers pipeline the requests; the
     // canvas reveals as soon as frame 0 paints and catches up as frames land.
     const images: HTMLImageElement[] = [];
-    for (let i = 0; i < FRAME_COUNT; i++) {
+    for (let i = 0; i < frameCount; i++) {
       const img = new Image();
       img.src = framePath(dir, i + 1);
       images[i] = img;
@@ -167,8 +156,8 @@ export function ScrubStage({
 
     const toIndex = (v: number) =>
       Math.min(
-        FRAME_COUNT - 1,
-        Math.floor(clamp01(v / videoEnd) * (FRAME_COUNT - 1)),
+        frameCount - 1,
+        Math.floor(clamp01(v / videoEnd) * (frameCount - 1)),
       );
 
     const unsub = progress.on("change", (v) => {
